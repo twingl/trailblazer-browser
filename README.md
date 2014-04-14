@@ -26,18 +26,18 @@ This is relatively simple. After installing the dev dependencies...
 
 ...you can:
 
-*run the default task* which watches the source directory, then runs the specs
+**run the default task** which watches the source directory, then runs the specs
 whenever part of the functional source changes
 
     $ gulp
 
-*run the autobuild task* which watches the source directory, compiling and
+**run the autobuild task** which watches the source directory, compiling and
 assembling the app as changes are made to the source files that require
 compilation
 
     $ gulp autobuild
 
-or *run the release task* which compiles, assembles, and packages the app ready
+or **run the release task** which compiles, assembles, and packages the app ready
 for deployment to the Chrome web store.
 
     $ gulp release
@@ -46,4 +46,4 @@ for deployment to the Chrome web store.
 
 Once the app is built (current revisions should be checked in, but build prior
 to loading to ensure their versions are consistent), you can load the unpacked
-app from the *APP\_ROOT* directory
+app from the `APP_ROOT` directory
