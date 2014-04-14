@@ -1,0 +1,31 @@
+{
+  "name": "twingl-browser-dev-env",
+  "version": "0.0.0",
+  "description": "Development container for Twingl Browser",
+  "dependencies": {
+    "gulp": "~3.6.0",
+    "coffee-script": "^1.7.1",
+    "gulp-coffee": "^1.4.1",
+    "gulp-concat": "^2.2.0",
+    "gulp-watch": "^0.5.4",
+    "gulp-sass": "^0.7.1",
+    "gulp-uglify": "^0.2.1",
+    "gulp-declare": "^0.2.0",
+    "gulp-define-module": "^0.1.0",
+    "gulp-ember-handlebars": "^0.6.0",
+    "gulp-zip": "^0.3.4",
+    "gulp-clean": "^0.2.4",
+    "gulp-util": "^2.2.14",
+    "event-stream": "^3.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/twingl/browser.git"
+  },
+  "author": "Greg Signal (Twingl Ltd.)",
+  "license": "Proprietary",
+  "bugs": {
+    "url": "https://github.com/twingl/browser/issues"
+  },
+  "homepage": "http://twin.gl"
+}

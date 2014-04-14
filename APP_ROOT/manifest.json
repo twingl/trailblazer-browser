@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "Twingl Browser",
+  "short_name": "Twingl",
+  "description": "Browse the web and become an expert easier",
+  "version": "0.0.0.0",
+  "permissions": [
+    "storage",
+    "unlimitedStorage"
+  ],
+  "app": {
+    "background": {
+      "scripts": [
+        "vendor/lib/underscore-1.6.0.js",
+        "vendor/lib/buffered-storage.js",
+        "vendor/lib/keen-2.1.0.min.js",
+        "background.js"
+      ]
+    }
+  },
+  "sandbox": {
+    "pages": [ "sandbox.html" ]
+  }
+}
