@@ -5,6 +5,7 @@
   "description": "Browse the web and become an expert easier",
   "version": "0.0.0.0",
   "permissions": [
+    "webview",
     "storage",
     "unlimitedStorage"
   ],
@@ -19,6 +20,6 @@
     }
   },
   "sandbox": {
-    "pages": [ "sandbox.html" ]
+    "pages": [  ]
   }
 }

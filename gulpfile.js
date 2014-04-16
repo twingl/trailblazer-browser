@@ -85,7 +85,13 @@ var locations = {
   src: {
     templates : [ 'templates/**/*.hbs' ],
     styles    : [ 'styles/**/*.scss' ],
-    scripts   : [ 'app/**/*.coffee' ]
+    scripts   : [
+      'app/boot.coffee',
+      'app/controllers/**/*.coffee',
+      'app/views/**/*.coffee',
+      'app/routes/**/*.coffee',
+      'app/main.coffee'
+    ]
   },
 
   // Intermediate location for compiled source
@@ -169,7 +175,7 @@ gulp.task('styles', function () {
 gulp.task('scripts', function () {
   return gulp.src(locations.src.scripts)
       .pipe(coffee())
-      .pipe(uglify())
+      //.pipe(uglify())
       .pipe(concat(files.scripts))
       .pipe(gulp.dest(locations.build.scripts));
 });
