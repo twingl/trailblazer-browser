@@ -9,6 +9,8 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   data.buffer.push("\n  </div>\n  <div id=\"t-pane-main\">");
   stack1 = helpers._triageMustache.call(depth0, "outlet", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</div>\n  <div id=\"t-pane-alt\">");
+  data.buffer.push(escapeExpression((helper = helpers.outlet || (depth0 && depth0.outlet),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data},helper ? helper.call(depth0, "alt", options) : helperMissing.call(depth0, "outlet", "alt", options))));
   data.buffer.push("</div>\n</div>\n");
   return buffer;
   
@@ -23,6 +25,15 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n");
   return buffer;
+  
+});
+Ember.TEMPLATES["alt/tree"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  
+
+
+  data.buffer.push("<p>placeholder</p>\n");
   
 });
 Ember.TEMPLATES["browser/main"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {

@@ -4,7 +4,7 @@ Twingl.Webview = Ember.View.extend
 
 #  webviewClose:             (evt) -> console.log(evt)
 #  webviewConsoleMessage:    (evt) -> console.log(evt)
-  webviewContentLoad:       (evt) -> @get('controller').send('contentLoaded', evt)
+#  webviewContentLoad:       (evt) -> @get('controller').send('contentLoaded', evt)
 #  webviewClose:             (evt) -> console.log(evt)
 #  webviewExit:              (evt) -> console.log(evt)
 #  webviewFindUpdate:        (evt) -> console.log(evt)

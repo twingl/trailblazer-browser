@@ -22,12 +22,12 @@ Twingl.WebviewController = Ember.Controller.extend
 
     loadRedirect: (e) ->
       if e.originalEvent.isTopLevel
-        @get('navigation').set 'url', e.originalEvent.url
+        @get('navigation').send 'loadRedirect', e
 
     loadCommit: (e) ->
       if e.originalEvent.isTopLevel
-        @get('navigation').set 'url', e.originalEvent.url
+        $('webview')[0].executeScript code: "document.title", (r) => document.title = r[0]
+        @get('navigation').send 'loadCommit', e
 
-    newWindow: (e) -> @log(e)
-
-  log: (e) -> console.log e.originalEvent.type, e.originalEvent
+    newWindow: (e) ->
+      @get('navigation').send 'newWindow', e

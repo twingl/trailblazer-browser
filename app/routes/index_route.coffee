@@ -7,3 +7,7 @@ Twingl.IndexRoute = Ember.Route.extend
     @render 'navigation/browser',
       outlet: 'navigation'
       controller: 'navigation'
+
+    @render 'alt/tree',
+      outlet: 'alt'
+      controller: 'tree'
