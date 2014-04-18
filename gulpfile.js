@@ -73,8 +73,8 @@ gulp.task('release', ['compile', 'copy', 'assemble'], function () {
 
 
 var files = {
-  templates   : 'app.hbs.js',
-  styles      : 'app.css',
+  templates   : 'app.hbs.min.js',
+  styles      : 'app.min.css',
   scripts     : 'app.min.js',
   packagedApp : 'twingl-browser',
   manifest    : './APP_ROOT/manifest'
