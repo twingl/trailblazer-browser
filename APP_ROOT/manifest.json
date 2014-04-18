@@ -10,6 +10,7 @@
     "storage",
     "unlimitedStorage"
   ],
+  "icons": { "128":"icon128.png" },
   "app": {
     "background": {
       "scripts": [
