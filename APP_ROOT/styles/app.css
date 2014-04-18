@@ -28,6 +28,8 @@ nav {
   position: absolute;
   top: 0;
   width: 100%; }
+  nav.loading {
+    background: red; }
   nav ul, nav ul li {
     border: 0;
     padding: 0;
@@ -35,3 +37,6 @@ nav {
   nav ul li {
     display: inline;
     list-style-type: none; }
+
+.t-url-input {
+  width: 400px; }

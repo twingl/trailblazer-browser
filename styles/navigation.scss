@@ -3,6 +3,8 @@ nav {
   top     : 0;
   width   : 100%;
 
+  &.loading { background: red; }
+
   ul {
     &, li {
       border : 0;
@@ -15,4 +17,8 @@ nav {
       list-style-type: none;
     }
   }
+}
+
+.t-url-input {
+  width: 400px;
 }

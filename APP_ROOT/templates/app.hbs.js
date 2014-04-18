@@ -31,11 +31,10 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', escapeExpression=this.escapeExpression;
 
 
-  data.buffer.push("<webview ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Twingl.Webview", {hash:{
     'src': ("url")
-  },hashTypes:{'src': "STRING"},hashContexts:{'src': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(" id=\"t-main-webview\"></webview>\n");
+  },hashTypes:{'src': "ID"},hashContexts:{'src': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n");
   return buffer;
   
 });
@@ -45,10 +44,16 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', escapeExpression=this.escapeExpression;
 
 
-  data.buffer.push("<nav>\n  <ul>\n    <li>");
+  data.buffer.push("<nav ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'class': ("loading")
+  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(">\n  <ul>\n    <li>");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Twingl.HistoryBackButton", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("</li>\n    <li>");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Twingl.HistoryForwardButton", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("</li>\n    <li>");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Twingl.HistoryReloadButton", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("</li>\n    <li>");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Twingl.UrlTextField", {hash:{
     'value': ("url")

@@ -1,7 +1,8 @@
-<nav>
+<nav {{bind-attr class="loading"}}>
   <ul>
     <li>{{view Twingl.HistoryBackButton}}</li>
     <li>{{view Twingl.HistoryForwardButton}}</li>
+    <li>{{view Twingl.HistoryReloadButton}}</li>
     <li>{{view Twingl.UrlTextField value=url}}{{view Twingl.UrlSubmitButton}}</li>
   </ul>
 </nav>
