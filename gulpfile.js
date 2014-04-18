@@ -10,6 +10,7 @@ var gulp    = require('gulp')
     // Compilation
   , clean         = require('gulp-clean')
   , concat        = require('gulp-concat')
+  , cssmin        = require('gulp-cssmin')
   , declare       = require('gulp-declare')
   , defineModule  = require('gulp-define-module')
   , uglify        = require('gulp-uglify')
@@ -151,6 +152,7 @@ gulp.task('clean', function () {
 gulp.task('templates', function () {
   return gulp.src(locations.src.templates)
       .pipe(handlebars({ outputType: 'browser'}))
+      .pipe(uglify())
       .pipe(concat(files.templates))
       .pipe(gulp.dest(locations.build.templates))
 });
@@ -163,6 +165,7 @@ gulp.task('templates', function () {
 gulp.task('styles', function () {
   return gulp.src(locations.src.styles)
       .pipe(sass())
+      .pipe(cssmin())
       .pipe(concat(files.styles))
       .pipe(gulp.dest(locations.build.styles));
 });
