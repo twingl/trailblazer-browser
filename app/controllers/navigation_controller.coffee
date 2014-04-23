@@ -84,7 +84,7 @@ Twingl.NavigationController = Ember.Controller.extend
       console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
       @set 'loading', false
       @set 'state', @states.nav_tree
-      $('#t-pane-main').hide()
+      #$('#t-pane-main').hide()
       $('#t-pane-alt').show()
       $('.t-navigation-element-main').hide()
       $('.t-navigation-element-alt').show 0, =>
@@ -94,7 +94,7 @@ Twingl.NavigationController = Ember.Controller.extend
     browserShow: ->
       console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
       @set 'state', @states.nav_browser
-      $('#t-pane-main').show()
+      #$('#t-pane-main').show()
       $('#t-pane-alt').hide()
       $('.t-navigation-element-main').show()
       $('.t-navigation-element-alt').hide()

@@ -5,6 +5,10 @@ nav {
 
   &.loading { background: red; }
 
+  .t-navigation-element-alt {
+    display: none;
+  }
+
   ul {
     &, li {
       border : 0;
