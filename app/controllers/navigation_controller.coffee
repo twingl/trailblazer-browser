@@ -14,12 +14,17 @@ Twingl.NavigationController = Ember.Controller.extend
 
   state: undefined
 
+  cOb: `function() {
+    console.log("(navCtrl) this.url: ", this.get('url'))
+  }.observes('url')`
+
   states:
     default     : 0
     nav_url     : 1
     hist_back   : 2
     hist_forward: 3
     nav_tree    : 4
+    nav_browser : 5
 
 
   updateTree: (url) ->
@@ -35,14 +40,17 @@ Twingl.NavigationController = Ember.Controller.extend
       # real history item.
       when @states.hist_back
         unless url == @get 'url'
-          @get('tree').send 'historyPop'
+          @get('tree').send 'historyPush'
           @state = @states.default
 
       when @states.hist_forward
-        @get('tree').send 'historyPush'
+        @get('tree').send 'historyPop'
         @state = @states.default
 
       when @states.nav_tree
+        @state = @states.default
+
+      when @states.nav_browser
         @state = @states.default
 
       else #default
@@ -55,7 +63,7 @@ Twingl.NavigationController = Ember.Controller.extend
     ###
     navigateUrl: ->
       @set 'state', @states.nav_url
-      @get('webview').navigate(@url)
+      @get('webview').navigate(@get('url'))
 
     navigateHistoryBack: ->
       @set 'state', @states.hist_back
@@ -71,6 +79,25 @@ Twingl.NavigationController = Ember.Controller.extend
     jumpToUrl: (url) ->
       console.log "[STUB] jumpToUrl: #{url}"
 
+    historyShow: ->
+      #@get('webview').set('url', @get('tree').get('currentNode').url)
+      console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
+      @set 'loading', false
+      @set 'state', @states.nav_tree
+      $('#t-pane-main').hide()
+      $('#t-pane-alt').show()
+      $('.t-navigation-element-main').hide()
+      $('.t-navigation-element-alt').show 0, =>
+        @get('tree').send('drawTree')
+
+
+    browserShow: ->
+      console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
+      @set 'state', @states.nav_browser
+      $('#t-pane-main').show()
+      $('#t-pane-alt').hide()
+      $('.t-navigation-element-main').show()
+      $('.t-navigation-element-alt').hide()
 
     ###
     # Filtered <webview> instigated events
