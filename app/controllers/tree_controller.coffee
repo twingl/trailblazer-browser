@@ -1,5 +1,6 @@
 Twingl.TreeController = Ember.Controller.extend
   needs: ['navigation']
+  navigation: Ember.computed.alias "controllers.navigation"
 
   currentNode: {}
 
@@ -45,6 +46,9 @@ Twingl.TreeController = Ember.Controller.extend
              .append("g")
               .attr("class", "node")
               .attr("transform", (d) -> "translate(#{d.y}, #{d.x})")
+              .on "click", (d) =>
+                @set 'currentNode', d
+                @get('navigation').send('navigateNode', d.url)
 
     nodeEnter.append("circle")
               .attr("r", "4px")

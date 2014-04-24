@@ -72,8 +72,9 @@ Twingl.NavigationController = Ember.Controller.extend
     navigateReload: ->
       @get('webview').reload()
 
-    jumpToUrl: (url) ->
-      console.log "[STUB] jumpToUrl: #{url}"
+    navigateNode: (url) ->
+      @set 'state', @states.nav_tree
+      @get('webview').navigate(url)
 
     historyShow: ->
       @set 'loading', false
