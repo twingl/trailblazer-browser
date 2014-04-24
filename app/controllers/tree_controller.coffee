@@ -26,14 +26,6 @@ Twingl.TreeController = Ember.Controller.extend
   # }
   ###
 
-  cOb: `function() {
-    console.log("this.currentNode: ", this.get('currentNode'))
-  }.observes('currentNode')`
-
-  hOb: `function() {
-    console.log("this.historyTree: ", this.get('historyTree'))
-  }.observes('historyTree')`
-
   historyTree: undefined
 
   d3data:
@@ -62,7 +54,7 @@ Twingl.TreeController = Ember.Controller.extend
               .attr("x", -10)
               .attr("dy", ".35em")
               .attr("text-anchor", "end")
-              .text( (d) -> d.url )
+              .text( (d) -> d.title )
 
     link = @get('d3data').svg.selectAll("path.link").data( links, (d) -> d.target.id )
 
@@ -82,66 +74,69 @@ Twingl.TreeController = Ember.Controller.extend
         @update()
         svgPanZoom.init({ 'selector': '#t-history-tree-viz>svg' })
 
-    newRoot: (url) ->
+    newRoot: (obj) ->
       node =
         id        : ++@currentNodeId
         root      : true
         parent    : undefined
         children  : []
         visited   : [ { start: Date.now(), finish: undefined, idle: false } ]
-        url       : url
+        url       : obj.url
+        title     : obj.title
         created_at: Date.now()
 
       if !@get('historyTree')
         @set('historyTree', node)
         @set('currentNode', node)
-        console.log "New Root! #{url}"
+        console.log "New Root! #{obj.url}"
       else
         node.parent = @get('currentNode')
         @get('currentNode').children ||= []
         @get('currentNode').children.push node
         @set('currentNode', node)
-        console.log "Creating new pseudo-root node: #{url}"
+        console.log "Creating new pseudo-root node: #{obj.url}"
 
-    newChild: (url) ->
+    newChild: (obj) ->
       @get('currentNode').children ||= []
-      if @get('currentNode').children.filterBy('url', url).length is 0
+      if @get('currentNode').children.filterBy('url', obj.url).length is 0
         node =
           id        : ++@currentNodeId
           root      : false
           parent    : @get('currentNode')
           children  : []
           visited   : []
-          url       : url
+          url       : obj.url
+          title     : obj.title
           created_at: Date.now()
 
         @get('currentNode').children.push(node)
-        console.log "Creating child node: #{url}"
+        console.log "Creating child node: #{obj.url}"
       else
-        console.log "Child node exists: #{url}"
+        console.log "Child node exists: #{obj.url}"
 
-    advance: (url) ->
+    advance: (obj) ->
       # check if url is a direct descendent - create new if not, otherwise move to child
       @get('currentNode').children ||= []
-      if @get('currentNode').children.filterBy('url', url).length is 0
+      if @get('currentNode').children.filterBy('url', obj.url).length is 0
         node =
           id        : ++@currentNodeId
           root      : false
           parent    : @get('currentNode')
           children  : []
           visited   : [ { start: Date.now(), finish: undefined, idle: false } ]
-          url       : url
+          url       : obj.url
+          title     : obj.title
           created_at: Date.now()
 
         @get('currentNode').children ||= []
         @get('currentNode').children.push(node)
         @set('currentNode', node)
-        console.log "Advancing to new node: #{url}"
+        console.log "Advancing to new node: #{obj.url}"
       else
-        node = @get('currentNode').children.filterBy('url', url).pop()
+        node = @get('currentNode').children.filterBy('url', obj.url).pop()
         node.visited.push { start: Date.now(), finish: undefined, idle: false }
         @set('currentNode', node)
-        console.log "Advancing to existing node: #{url}"
+        console.log "Advancing to existing node: #{obj.url}"
 
     historyPop: ->
       p = @get('historyStack').pop()

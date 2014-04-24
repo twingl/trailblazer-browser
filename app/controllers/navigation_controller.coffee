@@ -14,10 +14,6 @@ Twingl.NavigationController = Ember.Controller.extend
 
   state: undefined
 
-  cOb: `function() {
-    console.log("(navCtrl) this.url: ", this.get('url'))
-  }.observes('url')`
-
   states:
     default     : 0
     nav_url     : 1
@@ -27,10 +23,10 @@ Twingl.NavigationController = Ember.Controller.extend
     nav_browser : 5
 
 
-  updateTree: (url) ->
+  updateTree: (node) ->
     switch @state
       when @states.nav_url
-        @get('tree').send 'newRoot', url
+        @get('tree').send 'newRoot', { url: node.url, title: node.title }
         @state = @states.default
 
       # This URL equality check is to account for some odd behaviour when
@@ -39,7 +35,7 @@ Twingl.NavigationController = Ember.Controller.extend
       # back" to twitter.com then "advance" to the google search, which was the
       # real history item.
       when @states.hist_back
-        unless url == @get 'url'
+        unless node.url == @get 'url'
           @get('tree').send 'historyPush'
           @state = @states.default
 
@@ -54,7 +50,7 @@ Twingl.NavigationController = Ember.Controller.extend
         @state = @states.default
 
       else #default
-        @get('tree').send 'advance', url
+        @get('tree').send 'advance', { url: node.url, title: node.title }
         @state = @states.default
 
   actions:
@@ -80,11 +76,8 @@ Twingl.NavigationController = Ember.Controller.extend
       console.log "[STUB] jumpToUrl: #{url}"
 
     historyShow: ->
-      #@get('webview').set('url', @get('tree').get('currentNode').url)
-      console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
       @set 'loading', false
       @set 'state', @states.nav_tree
-      #$('#t-pane-main').hide()
       $('#t-pane-alt').show()
       $('.t-navigation-element-main').hide()
       $('.t-navigation-element-alt').show 0, =>
@@ -92,9 +85,7 @@ Twingl.NavigationController = Ember.Controller.extend
 
 
     browserShow: ->
-      console.log @get('url'), @get('webview').get('url'), $('webview').attr('src')
       @set 'state', @states.nav_browser
-      #$('#t-pane-main').show()
       $('#t-pane-alt').hide()
       $('.t-navigation-element-main').show()
       $('.t-navigation-element-alt').hide()
@@ -103,7 +94,7 @@ Twingl.NavigationController = Ember.Controller.extend
     # Filtered <webview> instigated events
     ###
     loadCommit: (e) ->
-      @updateTree e.originalEvent.url
+      @updateTree e.originalEvent
       @set 'url', e.originalEvent.url
 
     loadRedirect: (e) ->
