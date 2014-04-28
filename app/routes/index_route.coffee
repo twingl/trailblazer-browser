@@ -1,4 +1,4 @@
-Twingl.IndexRoute = Ember.Route.extend
+Twingl.IndexRoute = Ember.Route.extend Ember.SimpleAuth.AuthenticatedRouteMixin,
   renderTemplate: ->
     @render 'browser/main',
       outlet: 'main'

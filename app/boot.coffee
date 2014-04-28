@@ -1,6 +1,9 @@
 window.Twingl = Ember.Application.create
   rootElement: "#app"
 
+  ready: ->
+    document.title = "Twingl Browser"
+
   # Register the events emitted by the <webview> element
   customEvents:
     close             : "webviewClose"

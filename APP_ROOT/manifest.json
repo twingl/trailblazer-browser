@@ -8,7 +8,8 @@
   "permissions": [
     "webview",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "https://api.twin.gl/"
   ],
   "icons": { "128":"icon128.png" },
   "app": {

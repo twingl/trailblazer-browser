@@ -87,10 +87,12 @@ var locations = {
     templates : [ 'templates/**/*.hbs' ],
     styles    : [ 'styles/**/*.scss' ],
     scripts   : [
+      'app/initializers/**/*.coffee',
       'app/boot.coffee',
       'app/controllers/**/*.coffee',
       'app/views/**/*.coffee',
       'app/routes/**/*.coffee',
+      'app/router.coffee',
       'app/main.coffee'
     ]
   },
