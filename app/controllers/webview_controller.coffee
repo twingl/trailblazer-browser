@@ -5,8 +5,10 @@ Twingl.WebviewController = Ember.Controller.extend
   # events to NavigationController so that it can manage the state effectively.
   ###
 
-  needs: ['navigation']
+  needs: ['navigation', 'tree']
   navigation: Ember.computed.alias "controllers.navigation"
+
+  currentNode: Ember.computed.alias "controllers.tree.currentNode"
 
   url: ''
 
@@ -17,15 +19,20 @@ Twingl.WebviewController = Ember.Controller.extend
   reload:          -> $('webview')[0].reload()
 
   actions:
-    loadStart: (e) -> @get('navigation').set 'loading', true
-    loadStop:  (e) -> @get('navigation').set 'loading', false
+    loadStart: (e) ->
+      console.log "loadstart"
+      @get('navigation').set 'loading', true
+
+    loadStop:  (e) ->
+      console.log "loadstop"
+      @get('navigation').set 'loading', false
 
     loadRedirect: (e) ->
       if e.originalEvent.isTopLevel
         @get('navigation').send 'loadRedirect', e
 
     loadCommit: (e) ->
-      if e.originalEvent.isTopLevel
+      if e.originalEvent.isTopLevel and @get('currentNode').url != e.originalEvent.url
         $('webview')[0].executeScript code: "document.title", (r) =>
           document.title = r[0]
           e.originalEvent.title = r[0]

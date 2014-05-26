@@ -78,7 +78,6 @@ Twingl.NavigationController = Ember.Controller.extend
 
     historyShow: ->
       @set 'loading', false
-      @set 'state', @states.nav_tree
       $('#t-pane-alt').show()
       $('.t-navigation-element-main').hide()
       $('.t-navigation-element-alt').show 0, =>
@@ -86,7 +85,6 @@ Twingl.NavigationController = Ember.Controller.extend
 
 
     browserShow: ->
-      @set 'state', @states.nav_browser
       $('#t-pane-alt').hide()
       $('.t-navigation-element-main').show()
       $('.t-navigation-element-alt').hide()
@@ -96,10 +94,11 @@ Twingl.NavigationController = Ember.Controller.extend
     ###
     loadCommit: (e) ->
       @updateTree e.originalEvent
+      console.log @get('tree').get('currentNode'), @get 'state'
       @set 'url', e.originalEvent.url
 
     loadRedirect: (e) ->
       @set 'url', e.originalEvent.url
 
     newWindow: (e) ->
-      @get('tree').send 'newChild', e.originalEvent.targetUrl
+      @get('tree').send 'newChild', { url: e.originalEvent.targetUrl, title: e.originalEvent.targetUrl }
