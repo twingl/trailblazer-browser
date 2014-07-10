@@ -1,6 +1,20 @@
+# Responsible for the Trail interface.
+#
+# This controller stores the history tree in memory, and is responsible for
+# rendering it using D3 and handling interface events invoked from within the
+# trail view.
+#
+# This controller is very much a work in progress
+#
+# NOTE: `visited` log is not currently implemented fully
 Twingl.TreeController = Ember.Controller.extend
   needs: ['navigation']
   navigation: Ember.computed.alias "controllers.navigation"
+
+  resetState: ->
+    @set 'currentNode',   {}
+    @set 'historyStack',  []
+    @set 'curretnNodeId', 0
 
   currentNode: {}
 
@@ -9,6 +23,8 @@ Twingl.TreeController = Ember.Controller.extend
   currentNodeId: 0
 
   ###
+  # A sample node structure
+  #
   # {
   #   id: ID,
   #   root: Boolean, //Indicates if the item is a root item or direct child
@@ -24,6 +40,14 @@ Twingl.TreeController = Ember.Controller.extend
   #   ],
   #   url: String,
   #   created_at: Date
+  # }
+  # {
+  #   id: ID,
+  #   url: String,
+  #   title: String,
+  #   arrived_at: Date,
+  #   departed_at: Date,
+  #   idle: Boolean
   # }
   ###
 

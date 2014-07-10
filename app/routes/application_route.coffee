@@ -1,4 +1,4 @@
-Twingl.ApplicationRoute = Ember.Route.extend Ember.SimpleAuth.ApplicationRouteMixin,
+Twingl.ApplicationRoute = Ember.Route.extend SimpleAuth.ApplicationRouteMixin,
   actions:
     sessionAuthenticationSucceeded: ->
       console.log "logged in"
@@ -10,10 +10,9 @@ Twingl.ApplicationRoute = Ember.Route.extend Ember.SimpleAuth.ApplicationRouteMi
     authorizationFailed: (error) ->
       console.log "failed to authorize", error
 
-
     sessionInvalidationSucceeded: ->
       console.log "logged out"
-      Twingl.reset() # Clear application state
+      @get('controller').send('resetState')
 
     sessionInvalidationFailed: (error) ->
       console.log "failed to log out", error

@@ -1,2 +1,2 @@
-Twingl.LoginController = Ember.Controller.extend Ember.SimpleAuth.LoginControllerMixin,
-  authenticatorFactory: 'authenticator:oauth2-password-grant'
+Twingl.LoginController = Ember.Controller.extend SimpleAuth.LoginControllerMixin,
+  authenticator: 'twingl:authenticators:oauth2'

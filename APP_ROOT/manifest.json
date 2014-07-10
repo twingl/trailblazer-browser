@@ -4,12 +4,13 @@
   "short_name": "Twingl",
   "description": "Browse the web and become an expert easier",
   "version": "0.0.0.0",
-  "minimum_chrome_version": "25",
+  "minimum_chrome_version": "29",
   "permissions": [
     "webview",
     "storage",
+    "identity",
     "unlimitedStorage",
-    "https://api.twin.gl/"
+    "http://localhost:3000/"
   ],
   "icons": { "128":"icon128.png" },
   "app": {

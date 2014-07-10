@@ -54,20 +54,14 @@ var define, requireModule;
   requireModule.registry = registry;
 })();
 
-define("ember-simple-auth-oauth2", 
-  ["./ember-simple-auth-oauth2/authenticators/oauth2","./ember-simple-auth-oauth2/authorizers/oauth2","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
+define("simple-auth-oauth2/authenticators/oauth2", 
+  ["simple-auth/authenticators/base","simple-auth/utils/is-secure-url","simple-auth/utils/get-global-config","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     "use strict";
-    var Authenticator = __dependency1__.OAuth2;
-    var Authorizer = __dependency2__.OAuth2;
+    var Base = __dependency1__["default"];
+    var isSecureUrl = __dependency2__["default"];
+    var getGlobalConfig = __dependency3__["default"];
 
-    __exports__.Authenticator = Authenticator;
-    __exports__.Authorizer = Authorizer;
-  });
-define("ember-simple-auth-oauth2/authenticators/oauth2", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
@@ -76,20 +70,39 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
       ([RFC 6749](http://tools.ietf.org/html/rfc6749)), specifically the _"Resource
       Owner Password Credentials Grant Type"_.
 
-      This authenticator supports refreshing the access token automatically and
-      will trigger the `'updated'` event each time the token was refreshed.
+      This authenticator supports access token refresh (see
+      [RFC 6740, section 6](http://tools.ietf.org/html/rfc6749#section-6)).
 
       _The factory for this authenticator is registered as
-      `'authenticator:oauth2-password-grant'` in Ember's container._
+      `'simple-auth-authenticator:oauth2-password-grant'` in Ember's
+      container._
 
       @class OAuth2
-      @namespace Authenticators
+      @namespace SimpleAuth.Authenticators
+      @module simple-auth-oauth2/authenticators/oauth2
       @extends Base
     */
-    var OAuth2 = Ember.SimpleAuth.Authenticators.Base.extend({
+    __exports__["default"] = Base.extend({
+      /**
+        Triggered when the authenticator refreshes the access token (see
+        [RFC 6740, section 6](http://tools.ietf.org/html/rfc6749#section-6)).
+
+        @event updated
+        @param {Object} data The updated session data
+      */
+
       /**
         The endpoint on the server the authenticator acquires the access token
         from.
+
+        This value can be configured via the global environment object:
+
+        ```js
+        window.ENV = window.ENV || {};
+        window.ENV['simple-auth-oauth2'] = {
+          serverTokenEndpoint: '/some/custom/endpoint'
+        }
+        ```
 
         @property serverTokenEndpoint
         @type String
@@ -98,7 +111,35 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
       serverTokenEndpoint: '/token',
 
       /**
+        The endpoint on the server the authenticator uses to revoke tokens. Only
+        set this if the server actually supports token revokation.
+
+        This value can be configured via the global environment object:
+
+        ```js
+        window.ENV = window.ENV || {};
+        window.ENV['simple-auth-oauth2'] = {
+          serverTokenRevokationEndpoint: '/some/custom/endpoint'
+        }
+        ```
+
+        @property serverTokenRevokationEndpoint
+        @type String
+        @default null
+      */
+      serverTokenRevokationEndpoint: null,
+
+      /**
         Sets whether the authenticator automatically refreshes access tokens.
+
+        This value can be configured via the global environment object:
+
+        ```js
+        window.ENV = window.ENV || {};
+        window.ENV['simple-auth-oauth2'] = {
+          refreshAccessTokens: false
+        }
+        ```
 
         @property refreshAccessTokens
         @type Boolean
@@ -113,6 +154,17 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
       _refreshTokenTimeout: null,
 
       /**
+        @method init
+        @private
+      */
+      init: function() {
+        var globalConfig                   = getGlobalConfig('simple-auth-oauth2');
+        this.serverTokenEndpoint           = globalConfig.serverTokenEndpoint || this.serverTokenEndpoint;
+        this.serverTokenRevokationEndpoint = globalConfig.serverTokenRevokationEndpoint || this.serverTokenRevokationEndpoint;
+        this.refreshAccessTokens           = globalConfig.refreshAccessTokens || this.refreshAccessTokens;
+      },
+
+      /**
         Restores the session from a set of session properties; __will return a
         resolving promise when there's a non-empty `access_token` in the `data`__
         and a rejecting promise otherwise.
@@ -120,7 +172,7 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         This method also schedules automatic token refreshing when there are values
         for `refresh_token` and `expires_in` in the `data` and automatic token
         refreshing is not disabled (see
-        [Ember.SimpleAuth.Authenticators.OAuth2#refreshAccessTokens](#Ember-SimpleAuth-Authenticators-OAuth2-refreshAccessTokens)).
+        [`Authenticators.OAuth2#refreshAccessTokens`](#SimpleAuth-Authenticators-OAuth2-refreshAccessTokens)).
 
         @method restore
         @param {Object} data The data to restore the session from
@@ -151,8 +203,8 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
 
       /**
         Authenticates the session with the specified `credentials`; the credentials
-        are `POST`ed to the `serverTokenEndpoint` (see
-        [Ember.SimpleAuth.Authenticators.OAuth2#serverTokenEndpoint](#Ember-SimpleAuth-Authenticators-OAuth2-serverTokenEndpoint))
+        are send via a _"POST"_ request to the
+        [`Authenticators.OAuth2#serverTokenEndpoint`](#SimpleAuth-Authenticators-OAuth2-serverTokenEndpoint)
         and if they are valid the server returns an access token in response (see
         http://tools.ietf.org/html/rfc6749#section-4.3). __If the credentials are
         valid and authentication succeeds, a promise that resolves with the
@@ -162,7 +214,7 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         This method also schedules automatic token refreshing when there are values
         for `refresh_token` and `expires_in` in the server response and automatic
         token refreshing is not disabled (see
-        [Ember.SimpleAuth.Authenticators.OAuth2#refreshAccessTokens](#Ember-SimpleAuth-Authenticators-OAuth2-refreshAccessTokens)).
+        [`Authenticators.OAuth2#refreshAccessTokens`](#SimpleAuth-Authenticators-OAuth2-refreshAccessTokens)).
 
         @method authenticate
         @param {Object} credentials The credentials to authenticate the session with
@@ -172,7 +224,7 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         var _this = this;
         return new Ember.RSVP.Promise(function(resolve, reject) {
           var data = { grant_type: 'password', username: credentials.identification, password: credentials.password };
-          _this.makeRequest(data).then(function(response) {
+          _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
             Ember.run(function() {
               var expiresAt = _this.absolutizeExpirationTime(response.expires_in);
               _this.scheduleAccessTokenRefresh(response.expires_in, expiresAt, response.refresh_token);
@@ -191,17 +243,38 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         promise.
 
         @method invalidate
+        @param {Object} data The data of the session to be invalidated
         @return {Ember.RSVP.Promise} A resolving promise
       */
-      invalidate: function() {
-        Ember.run.cancel(this._refreshTokenTimeout);
-        delete this._refreshTokenTimeout;
-        return new Ember.RSVP.resolve();
+      invalidate: function(data) {
+        var _this = this;
+        function success(resolve) {
+          Ember.run.cancel(_this._refreshTokenTimeout);
+          delete _this._refreshTokenTimeout;
+          resolve();
+        }
+        return new Ember.RSVP.Promise(function(resolve, reject) {
+          if (!Ember.isEmpty(_this.serverTokenRevokationEndpoint)) {
+            var requests = [];
+            Ember.A(['access_token', 'refresh_token']).forEach(function(tokenType) {
+              if (!Ember.isEmpty(data[tokenType])) {
+                requests.push(_this.makeRequest(_this.serverTokenRevokationEndpoint, {
+                  token_type_hint: tokenType, token: data[tokenType]
+                }));
+              }
+            });
+            Ember.$.when.apply(Ember.$, requests).always(function(responses) {
+              success(resolve);
+            });
+          } else {
+            success(resolve);
+          }
+        });
       },
 
       /**
-        Sends an `AJAX` request to the `serverTokenEndpoint`. This will always be a
-        _"POST_" request with content type _"application/x-www-form-urlencoded"_ as
+        Sends an `AJAX` request to the `url`. This will always be a _"POST"_
+        request with content type _"application/x-www-form-urlencoded"_ as
         specified in [RFC 6749](http://tools.ietf.org/html/rfc6749).
 
         This method is not meant to be used directly but serves as an extension
@@ -209,16 +282,17 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         [RFC 6749, section 2.3](http://tools.ietf.org/html/rfc6749#section-2.3)).
 
         @method makeRequest
+        @param {Object} url The url to send the request to
         @param {Object} data The data to send with the request, e.g. username and password or the refresh token
         @return {Deferred object} A Deferred object (see [the jQuery docs](http://api.jquery.com/category/deferred-object/)) that is compatible to Ember.RSVP.Promise; will resolve if the request succeeds, reject otherwise
         @protected
       */
-      makeRequest: function(data) {
-        if (!Ember.SimpleAuth.Utils.isSecureUrl(this.serverTokenEndpoint)) {
+      makeRequest: function(url, data) {
+        if (!isSecureUrl(url)) {
           Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
         }
         return Ember.$.ajax({
-          url:         this.serverTokenEndpoint,
+          url:         url,
           type:        'POST',
           data:        data,
           dataType:    'json',
@@ -241,7 +315,9 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
           if (!Ember.isEmpty(refreshToken) && !Ember.isEmpty(expiresAt) && expiresAt > now - offset) {
             Ember.run.cancel(this._refreshTokenTimeout);
             delete this._refreshTokenTimeout;
-            this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresIn, refreshToken, expiresAt - now - offset);
+            if (!Ember.testing) {
+              this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresIn, refreshToken, expiresAt - now - offset);
+            }
           }
         }
       },
@@ -254,14 +330,14 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         var _this = this;
         var data  = { grant_type: 'refresh_token', refresh_token: refreshToken };
         return new Ember.RSVP.Promise(function(resolve, reject) {
-          _this.makeRequest(data).then(function(response) {
+          _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
             Ember.run(function() {
               expiresIn     = response.expires_in || expiresIn;
               refreshToken  = response.refresh_token || refreshToken;
               var expiresAt = _this.absolutizeExpirationTime(expiresIn);
               var data      = Ember.$.extend(response, { expires_in: expiresIn, expires_at: expiresAt, refresh_token: refreshToken });
               _this.scheduleAccessTokenRefresh(expiresIn, null, refreshToken);
-              _this.trigger('updated', data);
+              _this.trigger('sessionDataUpdated', data);
               resolve(data);
             });
           }, function(xhr, status, error) {
@@ -281,13 +357,14 @@ define("ember-simple-auth-oauth2/authenticators/oauth2",
         }
       }
     });
-
-    __exports__.OAuth2 = OAuth2;
   });
-define("ember-simple-auth-oauth2/authorizers/oauth2", 
-  ["exports"],
-  function(__exports__) {
+define("simple-auth-oauth2/authorizers/oauth2", 
+  ["simple-auth/authorizers/base","simple-auth/utils/is-secure-url","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
+    var Base = __dependency1__["default"];
+    var isSecureUrl = __dependency2__["default"];
+
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
@@ -298,13 +375,14 @@ define("ember-simple-auth-oauth2/authorizers/oauth2",
       `Authorization` header.
 
       _The factory for this authorizer is registered as
-      `'authorizer:oauth2-bearer'` in Ember's container._
+      `'simple-auth-authorizer:oauth2-bearer'` in Ember's container._
 
       @class OAuth2
-      @namespace Authorizers
+      @namespace SimpleAuth.Authorizers
+      @module simple-auth-devise/authorizers/oauth2
       @extends Base
     */
-    var OAuth2 = Ember.SimpleAuth.Authorizers.Base.extend({
+    __exports__["default"] = Base.extend({
       /**
         Authorizes an XHR request by sending the `access_token` property from the
         session as a bearer token in the `Authorization` header:
@@ -320,23 +398,65 @@ define("ember-simple-auth-oauth2/authorizers/oauth2",
       authorize: function(jqXHR, requestOptions) {
         var accessToken = this.get('session.access_token');
         if (this.get('session.isAuthenticated') && !Ember.isEmpty(accessToken)) {
-          if (!Ember.SimpleAuth.Utils.isSecureUrl(requestOptions.url)) {
+          if (!isSecureUrl(requestOptions.url)) {
             Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
           }
           jqXHR.setRequestHeader('Authorization', 'Bearer ' + accessToken);
         }
       }
     });
-
-    __exports__.OAuth2 = OAuth2;
   });
-var oauth2 = requireModule('ember-simple-auth-oauth2');
+define("simple-auth-oauth2/ember", 
+  ["./initializer"],
+  function(__dependency1__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
 
-global.Ember.SimpleAuth.Authenticators.OAuth2 = oauth2.Authenticator;
-global.Ember.SimpleAuth.Authorizers.OAuth2    = oauth2.Authorizer;
+    var initializer = __dependency1__["default"];
 
-global.Ember.SimpleAuth.initializeExtension(function(container, application, options) {
-  container.register('authorizer:oauth2-bearer', global.Ember.SimpleAuth.Authorizers.OAuth2);
-  container.register('authenticator:oauth2-password-grant', global.Ember.SimpleAuth.Authenticators.OAuth2);
+    Ember.onLoad('Ember.Application', function(Application) {
+      Application.initializer(initializer);
+    });
+  });
+define("simple-auth-oauth2/initializer", 
+  ["simple-auth-oauth2/authenticators/oauth2","simple-auth-oauth2/authorizers/oauth2","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
+
+    var Authenticator = __dependency1__["default"];
+    var Authorizer = __dependency2__["default"];
+
+    __exports__["default"] = {
+      name:       'simple-auth-oauth2',
+      before:     'simple-auth',
+      initialize: function(container, application) {
+        container.register('simple-auth-authorizer:oauth2-bearer', Authorizer);
+        container.register('simple-auth-authenticator:oauth2-password-grant', Authenticator);
+      }
+    };
+  });
+define('simple-auth/authenticators/base',  ['exports'], function(__exports__) {
+  __exports__['default'] = global.SimpleAuth.Authenticators.Base;
 });
+define('simple-auth/authorizers/base',  ['exports'], function(__exports__) {
+  __exports__['default'] = global.SimpleAuth.Authorizers.Base;
+});
+define('simple-auth/utils/is-secure-url',  ['exports'], function(__exports__) {
+  __exports__['default'] = global.SimpleAuth.Utils.isSecureUrl;
+});
+define('simple-auth/utils/get-global-config',  ['exports'], function(__exports__) {
+  __exports__['default'] = global.SimpleAuth.Utils.getGlobalConfig;
+});
+
+var initializer   = requireModule('simple-auth-oauth2/initializer').default;
+var Authenticator = requireModule('simple-auth-oauth2/authenticators/oauth2').default;
+var Authorizer    = requireModule('simple-auth-oauth2/authorizers/oauth2').default;
+
+global.SimpleAuth.Authenticators.OAuth2 = Authenticator;
+global.SimpleAuth.Authorizers.OAuth2    = Authorizer;
+
+requireModule('simple-auth-oauth2/ember');
 })((typeof global !== 'undefined') ? global : window);

@@ -54,55 +54,7 @@ var define, requireModule;
   requireModule.registry = registry;
 })();
 
-define("ember-simple-auth", 
-  ["./ember-simple-auth/core","./ember-simple-auth/session","./ember-simple-auth/authenticators","./ember-simple-auth/authorizers","./ember-simple-auth/stores","./ember-simple-auth/utils","./ember-simple-auth/mixins/application_route_mixin","./ember-simple-auth/mixins/authenticated_route_mixin","./ember-simple-auth/mixins/authentication_controller_mixin","./ember-simple-auth/mixins/login_controller_mixin","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __exports__) {
-    "use strict";
-    var setup = __dependency1__.setup;
-    var initializeExtension = __dependency1__.initializeExtension;
-    var Configuration = __dependency1__.Configuration;
-    var Session = __dependency2__.Session;
-    var Authenticators = __dependency3__.Authenticators;
-    var Authorizers = __dependency4__.Authorizers;
-    var Stores = __dependency5__.Stores;
-    var Utils = __dependency6__.Utils;
-    var ApplicationRouteMixin = __dependency7__.ApplicationRouteMixin;
-    var AuthenticatedRouteMixin = __dependency8__.AuthenticatedRouteMixin;
-    var AuthenticationControllerMixin = __dependency9__.AuthenticationControllerMixin;
-    var LoginControllerMixin = __dependency10__.LoginControllerMixin;
-
-    /**
-      Ember.SimpleAuth's main module.
-
-      @module Ember.SimpleAuth
-    */
-
-    __exports__.setup = setup;
-    __exports__.initializeExtension = initializeExtension;
-    __exports__.Configuration = Configuration;
-    __exports__.Session = Session;
-    __exports__.Authenticators = Authenticators;
-    __exports__.Authorizers = Authorizers;
-    __exports__.Stores = Stores;
-    __exports__.Utils = Utils;
-    __exports__.ApplicationRouteMixin = ApplicationRouteMixin;
-    __exports__.AuthenticatedRouteMixin = AuthenticatedRouteMixin;
-    __exports__.AuthenticationControllerMixin = AuthenticationControllerMixin;
-    __exports__.LoginControllerMixin = LoginControllerMixin;
-  });
-define("ember-simple-auth/authenticators", 
-  ["./authenticators/base","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Base = __dependency1__.Base;
-
-    var Authenticators = {
-      Base: Base
-    };
-
-    __exports__.Authenticators = Authenticators;
-  });
-define("ember-simple-auth/authenticators/base", 
+define("simple-auth/authenticators/base", 
   ["exports"],
   function(__exports__) {
     "use strict";
@@ -119,46 +71,71 @@ define("ember-simple-auth/authenticators/base",
       provider like Facebook etc. and depends on the specific authenticator. Any
       data that the authenticator receives upon successful authentication and
       resolves with from the
-      [Ember.SimpleAuth.Authenticators.Base#authenticate](#Ember-SimpleAuth-Authenticators-Base-authenticate)
+      [`Authenticators.Base#authenticate`](#SimpleAuth-Authenticators-Base-authenticate)
       method is stored in the session and can then be used by the authorizer (see
-      [Ember.SimpleAuth.Authorizers.Base](#Ember-SimpleAuth-Authorizers-Base)).
+      [`Authorizers.Base`](#SimpleAuth-Authorizers-Base)).
 
       The authenticator also decides whether a set of data that was restored from
       the session store (see
-      [Ember.SimpleAuth.Stores.Base](#Ember-SimpleAuth-Stores-Base)) is sufficient
-      for the session to be authenticated or not.
-
-      Authenticators may trigger the `'updated'` and the `'invalidated'` events.
-      The `'updated'` event signals that the session data changed while the
-      `'ìnvalidated`' event signals that the authenticator decided that the
-      session became invalid. Both events are handled by the session automatically.
-      The `'updated'` event requires the complete session data as its argument.
+      [`Stores.Base`](#SimpleAuth-Stores-Base)) is sufficient for the session to be
+      authenticated or not.
 
       __Custom authenticators have to be registered with Ember's dependency
       injection container__ so that the session can retrieve an instance, e.g.:
 
       ```javascript
-      var CustomAuthenticator = Ember.SimpleAuth.Authenticators.Base.extend({
+      import Base from 'simple-auth/authenticators/base';
+
+      var CustomAuthenticator = Base.extend({
         ...
       });
+
       Ember.Application.initializer({
         name: 'authentication',
         initialize: function(container, application) {
           container.register('authenticator:custom', CustomAuthenticator);
-          Ember.SimpleAuth.setup(container, application);
         }
       });
-      App.AuthenticationController  = Ember.Controller.extend(Ember.SimpleAuth.AuthenticationControllerMixin, {
-        authenticatorFactory: 'authenticator:custom'
+      ```
+
+      ```javascript
+      // app/controllers/login.js
+      import AuthenticationControllerMixin from 'simple-auth/mixins/authentication-controller-mixin';
+
+      export default Ember.Controller.extend(AuthenticationControllerMixin, {
+        authenticator: 'authenticator:custom'
       });
       ```
 
       @class Base
-      @namespace Authenticators
+      @namespace SimpleAuth.Authenticators
+      @module simple-auth/authenticators/base
       @extends Ember.Object
       @uses Ember.Evented
     */
-    var Base = Ember.Object.extend(Ember.Evented, {
+    __exports__["default"] = Ember.Object.extend(Ember.Evented, {
+      /**
+        __Triggered when the data that constitutes the session is updated by the
+        authenticator__. This might happen e.g. because the authenticator refreshes
+        it or an event from is triggered from an external authentication provider.
+        The session automatically catches that event, passes the updated data back
+        to the authenticator's
+        [SimpleAuth.Authenticators.Base#restore](#SimpleAuth-Authenticators-Base-restore)
+        method and handles the result of that invocation accordingly.
+
+        @event sessionDataUpdated
+        @param {Object} data The updated session data
+      */
+      /**
+        __Triggered when the data that constitutes the session is invalidated by
+        the authenticator__. This might happen e.g. because the date expires or an
+        event is triggered from an external authentication provider. The session
+        automatically catches that event and invalidates itself.
+
+        @event sessionDataInvalidated
+        @param {Object} data The updated session data
+      */
+
       /**
         Restores the session from a set of properties. __This method is invoked by
         the session either after the application starts up and session data was
@@ -173,7 +150,7 @@ define("ember-simple-auth/authenticators/base",
         argument will simply be forwarded through the promise. A rejecting promise
         indicates that authentication failed and the session will remain unchanged.
 
-        `Ember.SimpleAuth.Authenticators.Base`'s implementation always returns a
+        `SimpleAuth.Authenticators.Base`'s implementation always returns a
         rejecting promise.
 
         @method restore
@@ -190,14 +167,14 @@ define("ember-simple-auth/authenticators/base",
         implements (e.g. a set of credentials or a Facebook account id etc.). __The
         session will invoke this method when an action in the appliaction triggers
         authentication__ (see
-        [Ember.SimpleAuth.AuthenticationControllerMixin.actions#authenticate](#Ember-SimpleAuth-AuthenticationControllerMixin-authenticate)).
+        [SimpleAuth.AuthenticationControllerMixin.actions#authenticate](#SimpleAuth-AuthenticationControllerMixin-authenticate)).
 
         __This method returns a promise. A resolving promise will result in the
         session being authenticated.__ Any properties the promise resolves with
         will be saved in and accessible via the session. A rejecting promise
         indicates that authentication failed and the session will remain unchanged.
 
-        `Ember.SimpleAuth.Authenticators.Base`'s implementation always returns a
+        `SimpleAuth.Authenticators.Base`'s implementation always returns a
         rejecting promise and thus never authenticates the session.
 
         @method authenticate
@@ -219,7 +196,7 @@ define("ember-simple-auth/authenticators/base",
         session being invalidated.__ A rejecting promise will result in the session
         invalidation being intercepted and the session being left authenticated.
 
-        `Ember.SimpleAuth.Authenticators.Base`'s implementation always returns a
+        `SimpleAuth.Authenticators.Base`'s implementation always returns a
         resolving promise and thus never intercepts session invalidation.
 
         @method invalidate
@@ -229,22 +206,8 @@ define("ember-simple-auth/authenticators/base",
         return new Ember.RSVP.resolve();
       }
     });
-
-    __exports__.Base = Base;
   });
-define("ember-simple-auth/authorizers", 
-  ["./authorizers/base","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Base = __dependency1__.Base;
-
-    var Authorizers = {
-      Base: Base
-    };
-
-    __exports__.Authorizers = Authorizers;
-  });
-define("ember-simple-auth/authorizers/base", 
+define("simple-auth/authorizers/base", 
   ["exports"],
   function(__exports__) {
     "use strict";
@@ -256,28 +219,29 @@ define("ember-simple-auth/authorizers/base",
       implementing custom authorizers and must not be used directly.__
 
       __The authorizer preprocesses all XHR requests__ (except ones to 3rd party
-      origins, see [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup)) and makes
-      sure they have the required data attached that allows the server to identify
-      the user making the request. This data might be a specific header, data in
-      the query part of the URL, cookies etc. __The authorizer has to fit the
-      authenticator__ (see
-      [Ember.SimpleAuth.Authenticators.Base](#Ember-SimpleAuth-Authenticators-Base))
-      as it relies on data that the authenticator retrieved during authentication
-      and that it makes available through the session.
+      origins, see
+      [Configuration.crossOriginWhitelist](#SimpleAuth-Configuration-crossOriginWhitelist))
+      and makes sure they have the required data attached that allows the server to
+      identify the user making the request. This data might be an HTTP header,
+      query string parameters in the URL, cookies etc. __The authorizer has to fit
+      the authenticator__ (see
+      [SimpleAuth.Authenticators.Base](#SimpleAuth-Authenticators-Base))
+      as it relies on data that the authenticator acquires during authentication.
 
       @class Base
-      @namespace Authorizers
+      @namespace SimpleAuth.Authorizers
+      @module simple-auth/authorizers/base
       @extends Ember.Object
     */
-    var Base = Ember.Object.extend({
+    __exports__["default"] = Ember.Object.extend({
       /**
         The session the authorizer gets the data it needs to authorize requests
-        from (see [Ember.SimpleAuth.Session](#Ember-SimpleAuth-Session)).
+        from.
 
         @property session
         @readOnly
-        @type Ember.SimpleAuth.Session
-        @default the session instance that is created during Ember.SimpleAuth' setup (see [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup))
+        @type SimpleAuth.Session
+        @default the session instance
       */
       session: null,
 
@@ -286,7 +250,7 @@ define("ember-simple-auth/authorizers/base",
         allows the server to identify the user making the request (e.g. a token in
         the `Authorization` header or some other secret in the query string etc.).
 
-        `Ember.SimpleAuth.Authorizers.Base`'s implementation does nothing.
+        `SimpleAuth.Authorizers.Base`'s implementation does nothing.
 
         @method authorize
         @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
@@ -295,71 +259,33 @@ define("ember-simple-auth/authorizers/base",
       authorize: function(jqXHR, requestOptions) {
       }
     });
-
-    __exports__.Base = Base;
   });
-define("ember-simple-auth/core", 
-  ["./session","./stores","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
+define("simple-auth/configuration", 
+  ["./utils/get-global-config","exports"],
+  function(__dependency1__, __exports__) {
     "use strict";
-    var Session = __dependency1__.Session;
-    var registerStores = __dependency2__.registerStores;
-
-    function extractLocationOrigin(location) {
-      if (Ember.typeOf(location) === 'string') {
-        var link = document.createElement('a');
-        link.href = location;
-        //IE requires the following line when url is relative.
-        //First assignment of relative url to link.href results in absolute url on link.href but link.hostname and other properties are not set
-        //Second assignment of absolute url to link.href results in link.hostname and other properties being set as expected
-        link.href = link.href;
-        location = link;
-      }
-      var port = location.port;
-      if (Ember.isEmpty(port)) {
-        //need to include the port whether its actually present or not as some versions of IE will always set it
-        port = location.protocol === 'http:' ? '80' : (location.protocol === 'https:' ? '443' : '');
-      }
-      return location.protocol + '//' + location.hostname + (port !== '' ? ':' + port : '');
-    }
-
-    var urlOrigins     = {};
-    var documentOrigin = extractLocationOrigin(window.location);
-    var crossOriginWhitelist;
-    function shouldAuthorizeRequest(url) {
-      var urlOrigin = urlOrigins[url] = urlOrigins[url] || extractLocationOrigin(url);
-      return crossOriginWhitelist.indexOf(urlOrigin) > -1 || urlOrigin === documentOrigin;
-    }
-
-    function setupSession(store, container) {
-      var session = Session.create({ store: store, container: container });
-      var router  = container.lookup('router:main');
-      Ember.A([
-        'sessionAuthenticationSucceeded',
-        'sessionAuthenticationFailed',
-        'sessionInvalidationSucceeded',
-        'sessionInvalidationFailed'
-      ]).forEach(function(event) {
-        session.on(event, function() {
-          Array.prototype.unshift.call(arguments, event);
-          router.send.apply(router, arguments);
-        });
-      });
-      return session;
-    }
-
-    var extensionInitializers = [];
+    var getGlobalConfig = __dependency1__["default"];
 
     /**
-      Ember.SimpleAuth's configuration object.
+      Ember Simple Auth's configuration object.
+
+      To change any of these values, define a global environment object for Ember
+      Simple Auth and define the values there:
+
+      ```javascript
+      window.ENV = window.ENV || {};
+      window.ENV['simple-auth'] = {
+        authenticationRoute: 'sign-in'
+      };
+      ```
 
       @class Configuration
-      @namespace $mainModule
+      @namespace SimpleAuth
+      @module simple-auth/configuration
     */
-    var Configuration = {
+    __exports__["default"] = {
       /**
-        The route to transition to for authentication; should be set through
-        [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup).
+        The route to transition to for authentication.
 
         @property authenticationRoute
         @readOnly
@@ -370,8 +296,7 @@ define("ember-simple-auth/core",
       authenticationRoute: 'login',
 
       /**
-        The route to transition to after successful authentication; should be set
-        through [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup).
+        The route to transition to after successful authentication.
 
         @property routeAfterAuthentication
         @readOnly
@@ -382,113 +307,121 @@ define("ember-simple-auth/core",
       routeAfterAuthentication: 'index',
 
       /**
-        @property applicationRootUrl
+        The name of the property that the session is injected with into routes and
+        controllers.
+
+        @property sessionPropertyName
+        @readOnly
         @static
-        @private
         @type String
+        @default 'session'
+      */
+      sessionPropertyName: 'session',
+
+      /**
+        The authorizer factory to use as it is registered with Ember's container,
+        see
+        [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register);
+        when the application does not interact with a server that requires
+        authorized requests, no auzthorizer is needed.
+
+        @property authorizer
+        @readOnly
+        @static
+        @type String
+        @default null
+      */
+      authorizer: null,
+
+      /**
+        The store factory to use as it is registered with Ember's container, see
+        [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register).
+
+        @property store
+        @readOnly
+        @static
+        @type String
+        @default simple-auth-session-store:local-storage
+      */
+      store: 'simple-auth-session-store:local-storage',
+
+      /**
+        Ember Simple Auth will never authorize requests going to a different origin
+        than the one the Ember.js application was loaded from; to explicitely
+        enable authorization for additional origins, whitelist those origins with
+        this setting. _Beware that origins consist of protocol, host and port (port
+        can be left out when it is 80 for HTTP or 443 for HTTPS)_
+
+        @property crossOriginWhitelist
+        @readOnly
+        @static
+        @type Array
+        @default []
+      */
+      crossOriginWhitelist: [],
+
+      /**
+        @property applicationRootUrl
+        @private
       */
       applicationRootUrl: null,
-    };
 
-    /**
-      Sets up Ember.SimpleAuth for the application; this method __should be invoked
-      in a custom initializer__ like this:
-
-      ```javascript
-      Ember.Application.initializer({
-        name: 'authentication',
-        initialize: function(container, application) {
-          Ember.SimpleAuth.setup(container, application);
-        }
-      });
-      ```
-
-      @method setup
-      @namespace $mainModule
-      @static
-      @param {Container} container The Ember.js application's dependency injection container
-      @param {Ember.Application} application The Ember.js application instance
-      @param {Object} options
-        @param {String} [options.authorizerFactory] The authorizer factory to use as it is registered with Ember's container, see [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register); when the application does not interact with a server that requires authorized requests, no auzthorizer is needed
-        @param {Object} [options.storeFactory] The store factory to use as it is registered with Ember's container, see [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register) - defaults to `session-stores:local-storage`
-        @param {String} [options.authenticationRoute] route to transition to for authentication - defaults to `'login'`
-        @param {String} [options.routeAfterAuthentication] route to transition to after successful authentication - defaults to `'index'`
-        @param {Array[String]} [options.crossOriginWhitelist] Ember.SimpleAuth will never authorize requests going to a different origin than the one the Ember.js application was loaded from; to explicitely enable authorization for additional origins, whitelist those origins - defaults to `[]` _(beware that origins consist of protocol, host and port (port can be left out when it is 80 for HTTP or 443 for HTTPS))_
-    **/
-    var setup = function(container, application, options) {
-      application.deferReadiness();
-      registerStores(container);
-      extensionInitializers.forEach(function(initializer) {
-        initializer(container, application, options);
-      });
-
-      options                                = options || {};
-      Configuration.routeAfterAuthentication = options.routeAfterAuthentication || Configuration.routeAfterAuthentication;
-      Configuration.authenticationRoute      = options.authenticationRoute || Configuration.authenticationRoute;
-      Configuration.applicationRootUrl       = container.lookup('router:main').get('rootURL') || '/';
-      crossOriginWhitelist                   = Ember.A(options.crossOriginWhitelist || []).map(function(origin) {
-        return extractLocationOrigin(origin);
-      });
-
-      options.storeFactory = options.storeFactory || 'session-store:local-storage';
-      var store            = container.lookup(options.storeFactory);
-      var session          = setupSession(store, container);
-
-      container.register('session:main', session, { instantiate: false });
-      Ember.A(['controller', 'route']).forEach(function(component) {
-        container.injection(component, 'session', 'session:main');
-      });
-
-      if (!Ember.isEmpty(options.authorizerFactory)) {
-        var authorizer = container.lookup(options.authorizerFactory);
-        if (!!authorizer) {
-          authorizer.set('session', session);
-          Ember.$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-            if (shouldAuthorizeRequest(options.url)) {
-              authorizer.authorize(jqXHR, options);
-            }
-          });
-        }
-      } else {
-        Ember.Logger.debug('No authorizer factory was specified for Ember.SimpleAuth - specify one if backend requests need to be authorized.');
+      /**
+        @method load
+        @private
+      */
+      load: function(container) {
+        var globalConfig              = getGlobalConfig('simple-auth');
+        this.authenticationRoute      = globalConfig.authenticationRoute || this.authenticationRoute;
+        this.routeAfterAuthentication = globalConfig.routeAfterAuthentication || this.routeAfterAuthentication;
+        this.sessionPropertyName      = globalConfig.sessionPropertyName || this.sessionPropertyName;
+        this.authorizer               = globalConfig.authorizer || this.authorizer;
+        this.store                    = globalConfig.store || this.store;
+        this.crossOriginWhitelist     = globalConfig.crossOriginWhitelist || this.crossOriginWhitelist;
+        this.applicationRootUrl       = container.lookup('router:main').get('rootURL') || '/';
       }
-
-      var advanceReadiness = function() {
-        application.advanceReadiness();
-      };
-      session.restore().then(advanceReadiness, advanceReadiness);
     };
-
-    /**
-      Registers an extension initializer to be invoked when
-      [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup) is invoked. __This is used
-      by extensions__ to the base Ember.SimpleAuth library that can e.g. register
-      factories with the Ember.js dependency injection container here etc.
-
-      @method initializeExtension
-      @namespace $mainModule
-      @static
-      @param {Function} initializer The initializer to be invoked when [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup) is invoked; this will receive the same arguments as [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup).
-    */
-    var initializeExtension = function(initializer) {
-      extensionInitializers.push(initializer);
-    };
-
-    __exports__.setup = setup;
-    __exports__.initializeExtension = initializeExtension;
-    __exports__.Configuration = Configuration;
   });
-define("ember-simple-auth/mixins/application_route_mixin", 
-  ["./../core","exports"],
+define("simple-auth/ember", 
+  ["./initializer"],
+  function(__dependency1__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
+
+    var initializer = __dependency1__["default"];
+
+    Ember.onLoad('Ember.Application', function(Application) {
+      Application.initializer(initializer);
+    });
+  });
+define("simple-auth/initializer", 
+  ["./setup","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
+
+    var setup = __dependency1__["default"];
+
+    __exports__["default"] = {
+      name:       'simple-auth',
+      initialize: function(container, application) {
+        setup(container, application);
+      }
+    };
+  });
+define("simple-auth/mixins/application-route-mixin", 
+  ["./../configuration","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember  = global.Ember;
 
-    var Configuration = __dependency1__.Configuration;
+    var Configuration = __dependency1__["default"];
 
     /**
-      The mixin for the application route. This defines actions to authenticate the
+      The mixin for the application route; defines actions to authenticate the
       session as well as to invalidate it. These actions can be used in all
       templates like this:
 
@@ -500,9 +433,7 @@ define("ember-simple-auth/mixins/application_route_mixin",
       {{/if}}
       ```
 
-      While this code works it is __preferrable to use the regular `link-to` helper
-      for the _'login'_ link__ as that will add the `'active'` class to the link.
-      For the _'logout'_ actions of course there is no route.
+      or in the case that the application uses a dedicated route for logging in:
 
       ```handlebars
       {{#if session.isAuthenticated}}
@@ -517,27 +448,73 @@ define("ember-simple-auth/mixins/application_route_mixin",
       invalidation fails. These actions provide a good starting point for adding
       custom behavior to these events.
 
+      __When this mixin is used and the application's `ApplicationRoute` defines
+      the `beforeModel` method, that method has to call `_super`.__
+
+      Using this mixin is optional. Without using it, the session's events will not
+      be automatically translated into route actions but would have to be handled
+      inidivially, e.g. in an initializer:
+
+      ```javascript
+      Ember.Application.initializer({
+        name:       'authentication',
+        after:      'simple-auth',
+        initialize: function(container, application) {
+          var applicationRoute = container.lookup('route:application');
+          var session          = container.lookup('simple-auth-session:main');
+          // handle the session events
+          session.on('sessionAuthenticationSucceeded', function() {
+            applicationRoute.transitionTo('index');
+          });
+        }
+      });
+      ```
+
       @class ApplicationRouteMixin
-      @namespace $mainModule
+      @namespace SimpleAuth
+      @module simple-auth/mixins/application-route-mixin
       @extends Ember.Mixin
       @static
     */
-    var ApplicationRouteMixin = Ember.Mixin.create({
+    __exports__["default"] = Ember.Mixin.create({
+      /**
+        @method beforeModel
+        @private
+      */
+      beforeModel: function(transition) {
+        this._super(transition);
+        var _this = this;
+        Ember.A([
+          'sessionAuthenticationSucceeded',
+          'sessionAuthenticationFailed',
+          'sessionInvalidationSucceeded',
+          'sessionInvalidationFailed',
+          'authorizationFailed'
+        ]).forEach(function(event) {
+          _this.get(Configuration.sessionPropertyName).on(event, function(error) {
+            Array.prototype.unshift.call(arguments, event);
+            var target = transition.isActive ? transition : _this;
+            target.send.apply(target, arguments);
+          });
+        });
+      },
+
       actions: {
         /**
-          This action triggers transition to the `authenticationRoute` specified in
-          [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup). It can be used in
-          templates as shown above. It is also triggered automatically by
-          [Ember.SimpleAuth.AuthenticatedRouteMixin](#Ember-SimpleAuth-AuthenticatedRouteMixin)
-          whenever a route that requries authentication is accessed but the session
-          is not currently authenticated.
+          This action triggers transition to the
+          [`Configuration.authenticationRoute`](#SimpleAuth-Configuration-authenticationRoute).
+          It can be used in templates as shown above. It is also triggered
+          automatically by the
+          [`AuthenticatedRouteMixin`](#SimpleAuth-AuthenticatedRouteMixin) whenever
+          a route that requries authentication is accessed but the session is not
+          currently authenticated.
 
           __For an application that works without an authentication route (e.g.
           because it opens a new window to handle authentication there), this is
-          the method to override, e.g.:__
+          the action to override, e.g.:__
 
           ```javascript
-          App.ApplicationRoute = Ember.Route.extend(Ember.SimpleAuth.ApplicationRouteMixin, {
+          App.ApplicationRoute = Ember.Route.extend(SimpleAuth.ApplicationRouteMixin, {
             actions: {
               authenticateSession: function() {
                 this.get('session').authenticate('authenticator:custom', {});
@@ -556,18 +533,18 @@ define("ember-simple-auth/mixins/application_route_mixin",
           This action is triggered whenever the session is successfully
           authenticated. If there is a transition that was previously intercepted
           by
-          [AuthenticatedRouteMixin#beforeModel](#Ember-SimpleAuth-AuthenticatedRouteMixin-beforeModel)
-          it will retry that. If there is no such transition, this action
-          transitions to the `routeAfterAuthentication` specified in
-          [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup).
+          [`AuthenticatedRouteMixin#beforeModel`](#SimpleAuth-AuthenticatedRouteMixin-beforeModel)
+          it will retry it. If there is no such transition, this action transitions
+          to the
+          [`Configuration.routeAfterAuthentication`](#SimpleAuth-Configuration-routeAfterAuthentication).
 
           @method actions.sessionAuthenticationSucceeded
         */
         sessionAuthenticationSucceeded: function() {
-          var attemptedTransition = this.get('session.attemptedTransition');
+          var attemptedTransition = this.get(Configuration.sessionPropertyName).get('attemptedTransition');
           if (attemptedTransition) {
             attemptedTransition.retry();
-            this.set('session.attemptedTransition', null);
+            this.get(Configuration.sessionPropertyName).set('attemptedTransition', null);
           } else {
             this.transitionTo(Configuration.routeAfterAuthentication);
           }
@@ -577,12 +554,12 @@ define("ember-simple-auth/mixins/application_route_mixin",
           This action is triggered whenever session authentication fails. The
           `error` argument is the error object that the promise the authenticator
           returns rejects with. (see
-          [Ember.SimpleAuth.Authenticators.Base#authenticate](#Ember-SimpleAuth-Authenticators-Base-authenticate)).
+          [`Authenticators.Base#authenticate`](#SimpleAuth-Authenticators-Base-authenticate)).
 
           It can be overridden to display error messages etc.:
 
           ```javascript
-          App.ApplicationRoute = Ember.Route.extend(Ember.SimpleAuth.ApplicationRouteMixin, {
+          App.ApplicationRoute = Ember.Route.extend(SimpleAuth.ApplicationRouteMixin, {
             actions: {
               sessionAuthenticationFailed: function(error) {
                 this.controllerFor('application').set('loginErrorMessage', error.message);
@@ -592,21 +569,21 @@ define("ember-simple-auth/mixins/application_route_mixin",
           ```
 
           @method actions.sessionAuthenticationFailed
-          @param {any} error The error the promise returned by the authenticator rejects with, see [Ember.SimpleAuth.Authenticators.Base#authenticate](#Ember-SimpleAuth-Authenticators-Base-authenticate)
+          @param {any} error The error the promise returned by the authenticator rejects with, see [`Authenticators.Base#authenticate`](#SimpleAuth-Authenticators-Base-authenticate)
         */
         sessionAuthenticationFailed: function(error) {
         },
 
         /**
           This action invalidates the session (see
-          [Ember.SimpleAuth.Session#invalidate](#Ember-SimpleAuth-Session-invalidate)).
+          [`Session#invalidate`](#SimpleAuth-Session-invalidate)).
           If invalidation succeeds, it reloads the application (see
-          [Ember.SimpleAuth.ApplicationRouteMixin#sessionInvalidationSucceeded](#Ember-SimpleAuth-ApplicationRouteMixin-sessionInvalidationSucceeded)).
+          [`ApplicationRouteMixin#sessionInvalidationSucceeded`](#SimpleAuth-ApplicationRouteMixin-sessionInvalidationSucceeded)).
 
           @method actions.invalidateSession
         */
         invalidateSession: function() {
-          this.get('session').invalidate();
+          this.get(Configuration.sessionPropertyName).invalidate();
         },
 
         /**
@@ -629,7 +606,7 @@ define("ember-simple-auth/mixins/application_route_mixin",
           default.
 
           @method actions.sessionInvalidationFailed
-          @param {any} error The error the promise returned by the authenticator rejects with, see [Ember.SimpleAuth.Authenticators.Base#invalidate](#Ember-SimpleAuth-Authenticators-Base-invalidate)
+          @param {any} error The error the promise returned by the authenticator rejects with, see [`Authenticators.Base#invalidate`](#SimpleAuth-Authenticators-Base-invalidate)
         */
         sessionInvalidationFailed: function(error) {
         },
@@ -638,143 +615,145 @@ define("ember-simple-auth/mixins/application_route_mixin",
           This action is invoked when an authorization error occurs (which is
           the case __when the server responds with HTTP status 401__). It
           invalidates the session and reloads the application (see
-          [Ember.SimpleAuth.ApplicationRouteMixin#sessionInvalidationSucceeded](#Ember-SimpleAuth-ApplicationRouteMixin-sessionInvalidationSucceeded)).
+          [`ApplicationRouteMixin#sessionInvalidationSucceeded`](#SimpleAuth-ApplicationRouteMixin-sessionInvalidationSucceeded)).
 
           @method actions.authorizationFailed
         */
         authorizationFailed: function() {
-          this.get('session').invalidate();
-        },
-
-        /**
-          @method actions.error
-          @private
-        */
-        error: function(reason) {
-          if (reason.status === 401) {
-            this.send('authorizationFailed');
+          if (this.get(Configuration.sessionPropertyName).get('isAuthenticated')) {
+            this.get(Configuration.sessionPropertyName).invalidate();
           }
-          return true;
         }
       }
     });
-
-    __exports__.ApplicationRouteMixin = ApplicationRouteMixin;
   });
-define("ember-simple-auth/mixins/authenticated_route_mixin", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    var global = (typeof window !== 'undefined') ? window : {},
-        Ember = global.Ember;
-
-    /**
-      The mixin for routes that require the session to be authenticated in order to
-      be accessible. Including this mixin in a route automatically adds a hook that
-      enforces the session to be authenticated and redirect to the
-      `authenticationRoute` specified in
-      [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup) if it is not.
-
-      ```javascript
-        App.ProtectedRoute = Ember.Route.extend(Ember.SimpleAuth.AuthenticatedRouteMixin);
-      ```
-
-      `Ember.SimpleAuth.AuthenticatedRouteMixin` performs the redirect in the
-      `beforeModel` method so that in all methods executed after that the session
-      is guaranteed to be authenticated. __If `beforeModel` is overridden, ensure
-      that the custom implementation calls `this._super(transition)`__ so that the
-      session enforcement code is actually executed.
-
-      @class AuthenticatedRouteMixin
-      @extends Ember.Mixin
-      @static
-    */
-    var AuthenticatedRouteMixin = Ember.Mixin.create({
-      /**
-        This method implements the enforcement of the session being authenticated.
-        If the session is not authenticated, the current transition will be aborted
-        and a redirect will be triggered to the `authenticationRoute` specified in
-        [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup). The method also saves
-        the intercepted transition so that it can be retried after the session has
-        been authenticated (see
-        [Ember.SimpleAuth.ApplicationRouteMixin#sessionAuthenticationSucceeded](#Ember-SimpleAuth-ApplicationRouteMixin-sessionAuthenticationSucceeded)).
-
-        @method beforeModel
-        @param {Transition} transition The transition that lead to this route
-      */
-      beforeModel: function(transition) {
-        if (!this.get('session.isAuthenticated')) {
-          transition.abort();
-          this.set('session.attemptedTransition', transition);
-          transition.send('authenticateSession');
-        }
-      }
-    });
-
-    __exports__.AuthenticatedRouteMixin = AuthenticatedRouteMixin;
-  });
-define("ember-simple-auth/mixins/authentication_controller_mixin", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    var global = (typeof window !== 'undefined') ? window : {},
-        Ember = global.Ember;
-
-    /**
-      The mixin for the controller that handles the `authenticationRoute` specified
-      in [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup)). It provides the
-      `authenticate` action that will authenticate the session with the configured
-      authenticator (see
-      [Ember.SimpleAuth.AuthenticationControllerMixin#authenticatorFactory](#Ember-SimpleAuth-AuthenticationControllerMixin-authenticatorFactory)).
-
-      @class AuthenticationControllerMixin
-      @extends Ember.Mixin
-    */
-    var AuthenticationControllerMixin = Ember.Mixin.create({
-      /**
-        The authenticator used to authenticate the session.
-
-        @property authenticatorFactory
-        @type String
-        @default null
-      */
-      authenticatorFactory: null,
-
-      actions: {
-        /**
-          This action will authenticate the session with the configured
-          authenticator (see
-          [Ember.SimpleAuth.AuthenticationControllerMixin#authenticatorFactory](#Ember-SimpleAuth-AuthenticationControllerMixin-authenticatorFactory),
-          [Ember.SimpleAuth.Session#authenticate](#Ember-SimpleAuth-Session-authenticate)).
-
-          @method actions.authenticate
-          @param {Object} options Any options the auhtenticator needs to authenticate the session
-        */
-        authenticate: function(options) {
-          this.get('session').authenticate(this.get('authenticatorFactory'), options);
-        }
-      }
-    });
-
-    __exports__.AuthenticationControllerMixin = AuthenticationControllerMixin;
-  });
-define("ember-simple-auth/mixins/login_controller_mixin", 
-  ["./authentication_controller_mixin","exports"],
+define("simple-auth/mixins/authenticated-route-mixin", 
+  ["./../configuration","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
-    var AuthenticationControllerMixin = __dependency1__.AuthenticationControllerMixin;
+    var Configuration = __dependency1__["default"];
 
     /**
-      The mixin to use with the controller that handles the `authenticationRoute`
-      specified in
-      [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup) if the used authentication
-      mechanism works with a login form that asks for user credentials. It provides
-      the `authenticate` action that will authenticate the session with the
-      configured authenticator when invoked. __This is a specialization of
-      [Ember.SimpleAuth.AuthenticationControllerMixin](#Ember-SimpleAuth-AuthenticationControllerMixin).__
+      This mixin is for routes that require the session to be authenticated to be
+      accessible. Including this mixin in a route automatically adds a hook that
+      enforces the session to be authenticated and redirects to the
+      [`Configuration.authenticationRoute`](#SimpleAuth-Configuration-authenticationRoute)
+      if it is not.
+
+      ```javascript
+      // app/routes/protected.js
+      import AuthenticatedRouteMixin from 'simple-auth/mixins/authenticated-route-mixin';
+
+      export default Ember.Route.extend(AuthenticatedRouteMixin);
+      ```
+
+      `AuthenticatedRouteMixin` performs the redirect in the `beforeModel` method
+      so that in all methods executed after that the session is guaranteed to be
+      authenticated. __If `beforeModel` is overridden, ensure that the custom
+      implementation calls `this._super(transition)`__ so that the session
+      enforcement code is actually executed.
+
+      @class AuthenticatedRouteMixin
+      @namespace SimpleAuth
+      @module simple-auth/mixins/authenticated-route-mixin
+      @extends Ember.Mixin
+      @static
+    */
+    __exports__["default"] = Ember.Mixin.create({
+      /**
+        This method implements the enforcement of the session being authenticated.
+        If the session is not authenticated, the current transition will be aborted
+        and a redirect will be triggered to the
+        [`Configuration.authenticationRoute`](#SimpleAuth-Configuration-authenticationRoute).
+        The method also saves the intercepted transition so that it can be retried
+        after the session has been authenticated (see
+        [`ApplicationRouteMixin#sessionAuthenticationSucceeded`](#SimpleAuth-ApplicationRouteMixin-sessionAuthenticationSucceeded)).
+
+        @method beforeModel
+        @param {Transition} transition The transition that lead to this route
+      */
+      beforeModel: function(transition) {
+        this._super(transition);
+        if (!this.get(Configuration.sessionPropertyName).get('isAuthenticated')) {
+          transition.abort();
+          this.get(Configuration.sessionPropertyName).set('attemptedTransition', transition);
+          transition.send('authenticateSession');
+        }
+      }
+    });
+  });
+define("simple-auth/mixins/authentication-controller-mixin", 
+  ["./../configuration","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
+
+    var Configuration = __dependency1__["default"];
+
+    /**
+      This mixin is for the controller that handles the
+      [`Configuration.authenticationRoute`](#SimpleAuth-Configuration-authenticationRoute).
+      It provides the `authenticate` action that will authenticate the session with
+      the configured authenticator (see
+      [`AuthenticationControllerMixin#authenticator`](#SimpleAuth-AuthenticationControllerMixin-authenticator)).
+
+      @class AuthenticationControllerMixin
+      @namespace SimpleAuth
+      @module simple-auth/mixins/authentication-controller-mixin
+      @extends Ember.Mixin
+    */
+    __exports__["default"] = Ember.Mixin.create({
+      /**
+        The authenticator factory to use as it is registered with Ember's
+        container, see
+        [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register).
+
+        @property authenticator
+        @type String
+        @default null
+      */
+      authenticator: null,
+
+      actions: {
+        /**
+          This action will authenticate the session with the configured
+          authenticator (see
+          [`AuthenticationControllerMixin#authenticator`](#SimpleAuth-AuthenticationControllerMixin-authenticator),
+          [`Session#authenticate`](#SimpleAuth-Session-authenticate)).
+
+          @method actions.authenticate
+          @param {Object} options Any options the authenticator needs to authenticate the session
+        */
+        authenticate: function(options) {
+          var authenticator = this.get('authenticator');
+          Ember.assert('AuthenticationControllerMixin/LoginControllerMixin require the authenticator property to be set on the controller', !Ember.isEmpty(authenticator));
+          return this.get(Configuration.sessionPropertyName).authenticate(this.get('authenticator'), options);
+        }
+      }
+    });
+  });
+define("simple-auth/mixins/login-controller-mixin", 
+  ["./../configuration","./authentication-controller-mixin","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {},
+        Ember = global.Ember;
+
+    var Configuration = __dependency1__["default"];
+    var AuthenticationControllerMixin = __dependency2__["default"];
+
+    /**
+      This mixin is for the controller that handles the
+      [`Configuration.authenticationRoute`](#SimpleAuth-Configuration-authenticationRoute)
+      if the used authentication mechanism works with a login form that asks for
+      user credentials. It provides the `authenticate` action that will
+      authenticate the session with the configured authenticator when invoked.
+      __This is a specialization of
+      [`AuthenticationControllerMixin`](#SimpleAuth-AuthenticationControllerMixin).__
 
       Accompanying the controller that this mixin is mixed in the application needs
       to have a `login` template with the fields `identification` and `password` as
@@ -792,14 +771,16 @@ define("ember-simple-auth/mixins/login_controller_mixin",
       ```
 
       @class LoginControllerMixin
-      @extends Ember.SimpleAuth.AuthenticationControllerMixin
+      @namespace SimpleAuth
+      @module simple-auth/mixins/login-controller-mixin
+      @extends SimpleAuth.AuthenticationControllerMixin
     */
-    var LoginControllerMixin = Ember.Mixin.create(AuthenticationControllerMixin, {
+    __exports__["default"] = Ember.Mixin.create(AuthenticationControllerMixin, {
       actions: {
         /**
           This action will authenticate the session with the configured
           authenticator (see
-          [Ember.SimpleAuth.LoginControllerMixin#authenticatorFactory](#Ember-SimpleAuth-LoginControllerMixin-authenticatorFactory))
+          [AuthenticationControllerMixin#authenticator](#SimpleAuth-Authentication-authenticator))
           if both `identification` and `password` are non-empty. It passes both
           values to the authenticator.
 
@@ -815,10 +796,8 @@ define("ember-simple-auth/mixins/login_controller_mixin",
         }
       }
     });
-
-    __exports__.LoginControllerMixin = LoginControllerMixin;
   });
-define("ember-simple-auth/session", 
+define("simple-auth/session", 
   ["exports"],
   function(__exports__) {
     "use strict";
@@ -828,65 +807,109 @@ define("ember-simple-auth/session",
     /**
       __The session provides access to the current authentication state as well as
       any data the authenticator resolved with__ (see
-      [Ember.SimpleAuth.Authenticators.Base#authenticate](#Ember-SimpleAuth-Authenticators-Base-authenticate)).
-      It is created when Ember.SimpleAuth is set up (see
-      [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup)) and __injected into all
-      models, controllers, routes and views so that all parts of the application
-      can always access the current authentication state and other data__,
-      depending on the used authenticator and whether the session is actually
-      authenticated (see
-      [Ember.SimpleAuth.Authenticators.Base](#Ember-SimpleAuth-Authenticators-Base))).
+      [`Authenticators.Base#authenticate`](#SimpleAuth-Authenticators-Base-authenticate)).
+      It is created when Ember Simple Auth is set up and __injected into all
+      controllers and routes so that these parts of the application can always
+      access the current authentication state and other data__, depending on the
+      authenticator in use and whether the session is actually authenticated (see
+      [`Authenticators.Base`](#SimpleAuth-Authenticators-Base)).
 
-      The session also provides methods to authenticate it and to invalidate itself
+      The session also provides methods to authenticate and to invalidate itself
       (see
-      [Ember.SimpleAuth.Session#authenticate](#Ember-SimpleAuth-Session-authenticate),
-      [Ember.SimpleAuth.Session#invaldiate](#Ember-SimpleAuth-Session-invaldiate)).
+      [`Session#authenticate`](#SimpleAuth-Session-authenticate),
+      [`Session#invaldiate`](#SimpleAuth-Session-invaldiate)).
       These methods are usually invoked through actions from routes or controllers.
       To authenticate the session manually, simple call the
-      [Ember.SimpleAuth.Session#authenticate](#Ember-SimpleAuth-Session-authenticate)
+      [`Session#authenticate`](#SimpleAuth-Session-authenticate)
       method with the authenticator factory to use as well as any options the
       authenticator needs to authenticate the session:
 
       ```javascript
-        this.get('session').authenticate('authenticatorFactory', { some: 'option' }).then(function() {
-          // authentication was successful
-        }, function() {
-          // authentication failed
-        });
+      this.get('session').authenticate('authenticator:custom', { some: 'option' }).then(function() {
+        // authentication was successful
+      }, function() {
+        // authentication failed
+      });
       ```
-
-      When the session's authentication state changes or an attempt to change it
-      fails, it will trigger the `'sessionAuthenticationSucceeded'`,
-      `'sessionAuthenticationFailed'`, `'sessionInvalidationSucceeded'` or
-      `'sessionInvalidationFailed'` events.
 
       The session also observes the store and - if it is authenticated - the
       authenticator for changes (see
-      [Ember.SimpleAuth.Authenticators.Base](#Ember-SimpleAuth-Authenticators-Base)
-      end [Ember.SimpleAuth.Stores.Base](#Ember-SimpleAuth-Stores-Base)).
+      [`Authenticators.Base`](#SimpleAuth-Authenticators-Base)
+      end [`Stores.Base`](#SimpleAuth-Stores-Base)).
 
       @class Session
+      @namespace SimpleAuth
+      @module simple-auth/session
       @extends Ember.ObjectProxy
       @uses Ember.Evented
     */
-    var Session = Ember.ObjectProxy.extend(Ember.Evented, {
+    __exports__["default"] = Ember.ObjectProxy.extend(Ember.Evented, {
       /**
-        The authenticator factory used to authenticate the session. This is only
-        set when the session is currently authenticated.
+        Triggered __whenever the session is successfully authenticated__. When the
+        application uses the
+        [`ApplicationRouteMixin` mixin](#SimpleAuth-ApplicationRouteMixin),
+        [`ApplicationRouteMixin.actions#sessionAuthenticationSucceeded`](#SimpleAuth-ApplicationRouteMixin-sessionAuthenticationSucceeded)
+        will be invoked whenever this event is triggered.
 
-        @property authenticatorFactory
+        @event sessionAuthenticationSucceeded
+      */
+      /**
+        Triggered __whenever an attempt to authenticate the session fails__. When
+        the application uses the
+        [`ApplicationRouteMixin` mixin](#SimpleAuth-ApplicationRouteMixin),
+        [`ApplicationRouteMixin.actions#sessionAuthenticationFailed`](#SimpleAuth-ApplicationRouteMixin-sessionAuthenticationFailed)
+        will be invoked whenever this event is triggered.
+
+        @event sessionAuthenticationFailed
+        @param {Object} error The error object; this depends on the authenticator in use, see [SimpleAuth.Authenticators.Base#authenticate](#SimpleAuth-Authenticators-Base-authenticate)
+      */
+      /**
+        Triggered __whenever the session is successfully invalidated__. When the
+        application uses the
+        [`ApplicationRouteMixin` mixin](#SimpleAuth-ApplicationRouteMixin),
+        [`ApplicationRouteMixin.actions#sessionInvalidationSucceeded`](#SimpleAuth-ApplicationRouteMixin-sessionInvalidationSucceeded)
+        will be invoked whenever this event is triggered.
+
+        @event sessionInvalidationSucceeded
+      */
+      /**
+        Triggered __whenever an attempt to invalidate the session fails__. When the
+        application uses the
+        [`ApplicationRouteMixin` mixin](#SimpleAuth-ApplicationRouteMixin),
+        [`ApplicationRouteMixin.actions#sessionInvalidationFailed`](#SimpleAuth-ApplicationRouteMixin-sessionInvalidationFailed)
+        will be invoked whenever this event is triggered.
+
+        @event sessionInvalidationFailed
+        @param {Object} error The error object; this depends on the authenticator in use, see [SimpleAuth.Authenticators.Base#invalidate](#SimpleAuth-Authenticators-Base-invalidate)
+      */
+      /**
+        Triggered __whenever the server rejects the authorization information
+        passed with a request and responds with status 401__. When the application
+        uses the
+        [`ApplicationRouteMixin` mixin](#SimpleAuth-ApplicationRouteMixin),
+        [`ApplicationRouteMixin.actions#authorizationFailed`](#SimpleAuth-ApplicationRouteMixin-authorizationFailed)
+        will be invoked whenever this event is triggered.
+
+        @event authorizationFailed
+      */
+
+      /**
+        The authenticator factory to use as it is registered with Ember's
+        container, see
+        [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register).
+        This is only set when the session is currently authenticated.
+
+        @property authenticator
         @type String
         @readOnly
         @default null
       */
-      authenticatorFactory: null,
+      authenticator: null,
       /**
-        The store used to persist session properties. This is assigned during
-        Ember.SimpleAuth's setup and can be configured there
-        (see [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup)).
+        The store used to persist session properties.
 
         @property store
-        @type Ember.SimpleAuth.Stores.Base
+        @type SimpleAuth.Stores.Base
         @readOnly
         @default null
       */
@@ -920,10 +943,10 @@ define("ember-simple-auth/session",
       },
 
       /**
-        Authentices the session with an `authenticator` and appropriate `options`.
-        __This delegates the actual authentication work to the `authenticator`__
-        and handles the returned promise accordingly (see
-        [Ember.SimpleAuth.Authenticators.Base#authenticate](#Ember-SimpleAuth-Authenticators-Base-authenticate)).
+        Authenticates the session with an `authenticator` and appropriate
+        `options`. __This delegates the actual authentication work to the
+        `authenticator`__ and handles the returned promise accordingly (see
+        [`Authenticators.Base#authenticate`](#SimpleAuth-Authenticators-Base-authenticate)).
         All data the authenticator resolves with will be saved in the session.
 
         __This method returns a promise itself. A resolving promise indicates that
@@ -932,15 +955,16 @@ define("ember-simple-auth/session",
         unauthenticated.
 
         @method authenticate
-        @param {String} authenticatorFactory The authenticator factory to use as it is registered with Ember's container, see [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register)
+        @param {String} authenticator The authenticator factory to use as it is registered with Ember's container, see [Ember's API docs](http://emberjs.com/api/classes/Ember.Application.html#method_register)
         @param {Object} options The options to pass to the authenticator; depending on the type of authenticator these might be a set of credentials, a Facebook OAuth Token, etc.
         @return {Ember.RSVP.Promise} A promise that resolves when the session was authenticated successfully
       */
-      authenticate: function(authenticatorFactory, options) {
+      authenticate: function(authenticator, options) {
+        Ember.assert('Session#authenticate requires the authenticator factory to be specified, was ' + authenticator, !Ember.isEmpty(authenticator));
         var _this = this;
         return new Ember.RSVP.Promise(function(resolve, reject) {
-          _this.container.lookup(authenticatorFactory).authenticate(options).then(function(content) {
-            _this.setup(authenticatorFactory, content, true);
+          _this.container.lookup(authenticator).authenticate(options).then(function(content) {
+            _this.setup(authenticator, content, true);
             resolve();
           }, function(error) {
             _this.clear();
@@ -953,10 +977,10 @@ define("ember-simple-auth/session",
       /**
         Invalidates the session with the authenticator it is currently
         authenticated with (see
-        [Ember.SimpleAuth.Session#authenticatorFactory](#Ember-SimpleAuth-Session-authenticatorFactory)).
-        __This invokes the authenticator's `invalidate` method and handles the
-        returned promise accordingly__ (see
-        [Ember.SimpleAuth.Authenticators.Base#invalidate](#Ember-SimpleAuth-Authenticators-Base-invalidate)).
+        [`Session#authenticator`](#SimpleAuth-Session-authenticator)). __This
+        invokes the authenticator's `invalidate` method and handles the returned
+        promise accordingly__ (see
+        [`Authenticators.Base#invalidate`](#SimpleAuth-Authenticators-Base-invalidate)).
 
         __This method returns a promise itself. A resolving promise indicates that
         the session was successfully invalidated__ while a rejecting promise
@@ -971,9 +995,9 @@ define("ember-simple-auth/session",
       invalidate: function() {
         var _this = this;
         return new Ember.RSVP.Promise(function(resolve, reject) {
-          var authenticator = _this.container.lookup(_this.authenticatorFactory);
+          var authenticator = _this.container.lookup(_this.authenticator);
           authenticator.invalidate(_this.content).then(function() {
-            authenticator.off('updated');
+            authenticator.off('sessionDataUpdated');
             _this.clear(true);
             resolve();
           }, function(error) {
@@ -990,12 +1014,12 @@ define("ember-simple-auth/session",
       restore: function() {
         var _this = this;
         return new Ember.RSVP.Promise(function(resolve, reject) {
-          var restoredContent      = _this.store.restore();
-          var authenticatorFactory = restoredContent.authenticatorFactory;
-          if (!!authenticatorFactory) {
-            delete restoredContent.authenticatorFactory;
-            _this.container.lookup(authenticatorFactory).restore(restoredContent).then(function(content) {
-              _this.setup(authenticatorFactory, content);
+          var restoredContent = _this.store.restore();
+          var authenticator   = restoredContent.authenticator;
+          if (!!authenticator) {
+            delete restoredContent.authenticator;
+            _this.container.lookup(authenticator).restore(restoredContent).then(function(content) {
+              _this.setup(authenticator, content);
               resolve();
             }, function() {
               _this.store.clear();
@@ -1012,16 +1036,18 @@ define("ember-simple-auth/session",
         @method setup
         @private
       */
-      setup: function(authenticatorFactory, content, trigger) {
+      setup: function(authenticator, content, trigger) {
         trigger = !!trigger && !this.get('isAuthenticated');
+        this.beginPropertyChanges();
         this.setProperties({
-          isAuthenticated:      true,
-          authenticatorFactory: authenticatorFactory,
-          content:              content
+          isAuthenticated: true,
+          authenticator:   authenticator,
+          content:         content
         });
         this.bindToAuthenticatorEvents();
-        var data = Ember.$.extend({ authenticatorFactory: authenticatorFactory }, this.content);
+        var data = Ember.$.extend({ authenticator: authenticator }, this.content);
         this.store.replace(data);
+        this.endPropertyChanges();
         if (trigger) {
           this.trigger('sessionAuthenticationSucceeded');
         }
@@ -1033,12 +1059,14 @@ define("ember-simple-auth/session",
       */
       clear: function(trigger) {
         trigger = !!trigger && this.get('isAuthenticated');
+        this.beginPropertyChanges();
         this.setProperties({
-          isAuthenticated:      false,
-          authenticatorFactory: null,
-          content:              {}
+          isAuthenticated: false,
+          authenticator:   null,
+          content:         {}
         });
         this.store.clear();
+        this.endPropertyChanges();
         if (trigger) {
           this.trigger('sessionInvalidationSucceeded');
         }
@@ -1050,13 +1078,13 @@ define("ember-simple-auth/session",
       */
       bindToAuthenticatorEvents: function() {
         var _this = this;
-        var authenticator = this.container.lookup(this.authenticatorFactory);
-        authenticator.off('updated');
-        authenticator.off('invalidated');
-        authenticator.on('updated', function(content) {
-          _this.setup(_this.authenticatorFactory, content);
+        var authenticator = this.container.lookup(this.authenticator);
+        authenticator.off('sessionDataUpdated');
+        authenticator.off('sessionDataInvalidated');
+        authenticator.on('sessionDataUpdated', function(content) {
+          _this.setup(_this.authenticator, content);
         });
-        authenticator.on('invalidated', function(content) {
+        authenticator.on('sessionDataInvalidated', function(content) {
           _this.clear(true);
         });
       },
@@ -1067,12 +1095,12 @@ define("ember-simple-auth/session",
       */
       bindToStoreEvents: function() {
         var _this = this;
-        this.store.on('updated', function(content) {
-          var authenticatorFactory = content.authenticatorFactory;
-          if (!!authenticatorFactory) {
-            delete content.authenticatorFactory;
-            _this.container.lookup(authenticatorFactory).restore(content).then(function(content) {
-              _this.setup(authenticatorFactory, content, true);
+        this.store.on('sessionDataUpdated', function(content) {
+          var authenticator = content.authenticator;
+          if (!!authenticator) {
+            delete content.authenticator;
+            _this.container.lookup(authenticator).restore(content).then(function(content) {
+              _this.setup(authenticator, content, true);
             }, function() {
               _this.clear(true);
             });
@@ -1082,39 +1110,102 @@ define("ember-simple-auth/session",
         });
       }
     });
-
-    __exports__.Session = Session;
   });
-define("ember-simple-auth/stores", 
-  ["./stores/base","./stores/local_storage","./stores/ephemeral","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
+define("simple-auth/setup", 
+  ["./configuration","./session","./stores/local-storage","./stores/ephemeral","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
     "use strict";
-    var Base = __dependency1__.Base;
-    var LocalStorage = __dependency2__.LocalStorage;
-    var Ephemeral = __dependency3__.Ephemeral;
+    var Configuration = __dependency1__["default"];
+    var Session = __dependency2__["default"];
+    var LocalStorage = __dependency3__["default"];
+    var Ephemeral = __dependency4__["default"];
 
-    var Stores = {
-      Base:         Base,
-      LocalStorage: LocalStorage,
-      Ephemeral:    Ephemeral
-    };
+    function extractLocationOrigin(location) {
+      if (Ember.typeOf(location) === 'string') {
+        var link = document.createElement('a');
+        link.href = location;
+        //IE requires the following line when url is relative.
+        //First assignment of relative url to link.href results in absolute url on link.href but link.hostname and other properties are not set
+        //Second assignment of absolute url to link.href results in link.hostname and other properties being set as expected
+        link.href = link.href;
+        location = link;
+      }
+      var port = location.port;
+      if (Ember.isEmpty(port)) {
+        //need to include the port whether its actually present or not as some versions of IE will always set it
+        port = location.protocol === 'http:' ? '80' : (location.protocol === 'https:' ? '443' : '');
+      }
+      return location.protocol + '//' + location.hostname + (port !== '' ? ':' + port : '');
+    }
 
-    var registerStores = function(container) {
-      container.register('session-store:local-storage', LocalStorage);
-      container.register('session-store:ephemeral', Ephemeral);
-    };
+    var urlOrigins     = {};
+    var crossOriginWhitelist;
+    function shouldAuthorizeRequest(options) {
+      if (options.crossDomain === false) {
+        return true;
+      }
+      var urlOrigin = urlOrigins[options.url] = urlOrigins[options.url] || extractLocationOrigin(options.url);
+      return crossOriginWhitelist.indexOf(urlOrigin) > -1;
+    }
 
-    __exports__.registerStores = registerStores;
-    __exports__.Stores = Stores;
+    function registerStores(container) {
+      container.register('simple-auth-session-store:local-storage', LocalStorage);
+      container.register('simple-auth-session-store:ephemeral', Ephemeral);
+    }
+
+    /**
+      @method setup
+      @private
+    **/
+    __exports__["default"] = function(container, application) {
+      Configuration.load(container);
+      application.deferReadiness();
+      registerStores(container);
+
+      var store            = container.lookup(Configuration.store);
+      var session          = Session.create({ store: store, container: container });
+      crossOriginWhitelist = Ember.A(Configuration.crossOriginWhitelist).map(function(origin) {
+        return extractLocationOrigin(origin);
+      });
+
+      container.register('simple-auth-session:main', session, { instantiate: false });
+      Ember.A(['controller', 'route']).forEach(function(component) {
+        container.injection(component, Configuration.sessionPropertyName, 'simple-auth-session:main');
+      });
+
+      if (!Ember.isEmpty(Configuration.authorizer)) {
+        var authorizer = container.lookup(Configuration.authorizer);
+        if (!!authorizer) {
+          authorizer.set('session', session);
+          Ember.$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+            if (!authorizer.isDestroyed && shouldAuthorizeRequest(options)) {
+              authorizer.authorize(jqXHR, options);
+            }
+          });
+          Ember.$(document).ajaxError(function(event, jqXHR, setting, exception) {
+            if (jqXHR.status === 401) {
+              session.trigger('authorizationFailed');
+            }
+          });
+        }
+      } else {
+        Ember.Logger.debug('No authorizer factory was configured for Ember Simple Auth - specify one if backend requests need to be authorized.');
+      }
+
+      var advanceReadiness = function() {
+        application.advanceReadiness();
+      };
+      session.restore().then(advanceReadiness, advanceReadiness);
+    }
   });
-define("ember-simple-auth/stores/base", 
-  ["../utils/flat_objects_are_equal","exports"],
+define("simple-auth/stores/base", 
+  ["../utils/flat-objects-are-equal","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
-    var flatObjectsAreEqual = __dependency1__.flatObjectsAreEqual;
+    var flatObjectsAreEqual = __dependency1__["default"];
 
     /**
       The base for all store types. __This serves as a starting point for
@@ -1122,27 +1213,39 @@ define("ember-simple-auth/stores/base",
 
       Stores are used to persist the session's state so it survives a page reload
       and is synchronized across multiple tabs or windows of the same application.
-      The store to be used with the application can be configured during
-      Ember.SimpleAuth's setup
-      (see [Ember.SimpleAuth.setup](#Ember-SimpleAuth-setup)).
+      The store to be used with the application can be configured in the global
+      configuration object:
 
-      Stores may trigger the `'updated'` event when their data changed due to
-      external actions (e.g. from another tab). The session listens to that event
-      and will handle the changes accordingly. Whenever the event is triggered by
-      the store, the session will forward the data to its authenticator which
-      decides whether the session is still valid (see
-      [Ember.SimpleAuth.Authenticators.Base#restore](#Ember-SimpleAuth-Authenticators-Base-restore)).
+      ```js
+      window.ENV = window.ENV || {};
+      window.ENV['simple-auth'] = {
+        store: 'simple-auth-session-store:local-storage'
+      }
+      ```
 
       @class Base
-      @namespace Stores
+      @namespace SimpleAuth.Stores
+      @module simple-auth/stores/base
       @extends Ember.Object
       @uses Ember.Evented
     */
-    var Base = Ember.Object.extend(Ember.Evented, {
+    __exports__["default"] = Ember.Object.extend(Ember.Evented, {
+      /**
+        __Triggered when the data that constitutes the session changes in the
+        store. This usually happens because the session is authenticated or
+        invalidated in another tab or window.__ The session automatically catches
+        that event, passes the updated data to its authenticator's
+        [`Authenticators.Base#restore`](#SimpleAuth-Authenticators-Base-restore)
+        method and handles the result of that invocation accordingly.
+
+        @event sessionDataUpdated
+        @param {Object} data The updated session data
+      */
+
       /**
         Persists the `data` in the store.
 
-        `Ember.SimpleAuth.Stores.Base`'s implementation does nothing.
+        `Stores.Base`'s implementation does nothing.
 
         @method persist
         @param {Object} data The data to persist
@@ -1153,8 +1256,7 @@ define("ember-simple-auth/stores/base",
       /**
         Restores all data currently saved in the store as a plain object.
 
-        `Ember.SimpleAuth.Stores.Base`'s implementation always returns an empty
-        plain Object.
+        `Stores.Base`'s implementation always returns an empty plain Object.
 
         @method restore
         @return {Object} The data currently persisted in the store.
@@ -1166,9 +1268,9 @@ define("ember-simple-auth/stores/base",
       /**
         Replaces all data currently saved in the store with the specified `data`.
 
-        `Ember.SimpleAuth.Stores.Base`'s implementation clears the store, then
-        persists the specified `data`. If the store's current content is equal to
-        the specified `data`, nothing is done.
+        `Stores.Base`'s implementation clears the store, then persists the
+        specified `data`. If the store's current content is equal to the specified
+        `data`, nothing is done.
 
         @method replace
         @param {Object} data The data to replace the store's content with
@@ -1183,24 +1285,22 @@ define("ember-simple-auth/stores/base",
       /**
         Clears the store.
 
-        `Ember.SimpleAuth.Stores.Base`'s implementation does nothing.
+        `Stores.Base`'s implementation does nothing.
 
         @method clear
       */
       clear: function() {
       }
     });
-
-    __exports__.Base = Base;
   });
-define("ember-simple-auth/stores/ephemeral", 
+define("simple-auth/stores/ephemeral", 
   ["./base","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
-    var Base = __dependency1__.Base;
+    var Base = __dependency1__["default"];
 
     /**
       Store that saves its data in memory and thus __is not actually persistent__.
@@ -1209,14 +1309,15 @@ define("ember-simple-auth/stores/ephemeral",
 
       __This store is mainly useful for testing.__
 
-      _The factory for this store is registered as `'session-store:ephemeral'` in
-      Ember's container._
+      _The factory for this store is registered as
+      `'simple-auth-session-store:ephemeral'` in Ember's container._
 
       @class Ephemeral
-      @namespace Stores
+      @namespace SimpleAuth.Stores
+      @module simple-auth/stores/ephemeral
       @extends Stores.Base
     */
-    var Ephemeral = Base.extend({
+    __exports__["default"] = Base.extend({
       /**
         @method init
         @private
@@ -1255,33 +1356,31 @@ define("ember-simple-auth/stores/ephemeral",
         this._data = {};
       }
     });
-
-    __exports__.Ephemeral = Ephemeral;
   });
-define("ember-simple-auth/stores/local_storage", 
-  ["./base","../utils/flat_objects_are_equal","exports"],
+define("simple-auth/stores/local-storage", 
+  ["./base","../utils/flat-objects-are-equal","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var global = (typeof window !== 'undefined') ? window : {},
         Ember = global.Ember;
 
-    var Base = __dependency1__.Base;
-    var flatObjectsAreEqual = __dependency2__.flatObjectsAreEqual;
+    var Base = __dependency1__["default"];
+    var flatObjectsAreEqual = __dependency2__["default"];
 
     /**
       Store that saves its data in the browser's `localStorage`.
 
-      This store will trigger the `'updated'` event when any of the keys it manages
-      is changed from another tab or window.
+      _The factory for this store is registered as
+      `'simple-auth-session-store:local-storage'` in Ember's container._
 
-      _The factory for this store is registered as `'session-store:local-storage'`
-      in Ember's container._
+      __`Stores.LocalStorage` is Ember Simple Auth's default store.__
 
       @class LocalStorage
-      @namespace Stores
+      @namespace SimpleAuth.Stores
+      @module simple-auth/stores/local-storage
       @extends Stores.Base
     */
-    var LocalStorage = Base.extend({
+    __exports__["default"] = Base.extend({
       /**
         The prefix to use for the store's keys so they can be distinguished from
         others.
@@ -1385,30 +1484,14 @@ define("ember-simple-auth/stores/local_storage",
             _this._lastData = data;
             Ember.run.cancel(_this._triggerChangeEventTimeout);
             _this._triggerChangeEventTimeout = Ember.run.next(_this, function() {
-              this.trigger('updated', data);
+              this.trigger('sessionDataUpdated', data);
             });
           }
         });
       }
     });
-
-    __exports__.LocalStorage = LocalStorage;
   });
-define("ember-simple-auth/utils", 
-  ["./utils/is_secure_url","./utils/flat_objects_are_equal","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
-    "use strict";
-    var isSecureUrl = __dependency1__.isSecureUrl;
-    var flatObjectsAreEqual = __dependency2__.flatObjectsAreEqual;
-
-    var Utils = {
-      isSecureUrl:         isSecureUrl,
-      flatObjectsAreEqual: flatObjectsAreEqual
-    };
-
-    __exports__.Utils = Utils;
-  });
-define("ember-simple-auth/utils/flat_objects_are_equal", 
+define("simple-auth/utils/flat-objects-are-equal", 
   ["exports"],
   function(__exports__) {
     "use strict";
@@ -1416,7 +1499,7 @@ define("ember-simple-auth/utils/flat_objects_are_equal",
       @method flatObjectsAreEqual
       @private
     */
-    var flatObjectsAreEqual = function(a, b) {
+    __exports__["default"] = function(a, b) {
       function sortObject(object) {
         var array = [];
         for (var property in object) {
@@ -1433,11 +1516,19 @@ define("ember-simple-auth/utils/flat_objects_are_equal",
         });
       }
       return JSON.stringify(sortObject(a)) === JSON.stringify(sortObject(b));
-    };
-
-    __exports__.flatObjectsAreEqual = flatObjectsAreEqual;
+    }
   });
-define("ember-simple-auth/utils/is_secure_url", 
+define("simple-auth/utils/get-global-config", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    var global = (typeof window !== 'undefined') ? window : {};
+
+    __exports__["default"] = function(scope) {
+      return(global.ENV || {})[scope] || {};
+    }
+  });
+define("simple-auth/utils/is-secure-url", 
   ["exports"],
   function(__exports__) {
     "use strict";
@@ -1445,14 +1536,59 @@ define("ember-simple-auth/utils/is_secure_url",
       @method isSecureUrl
       @private
     */
-    var isSecureUrl = function(url) {
+    __exports__["default"] = function(url) {
       var link  = document.createElement('a');
-      link.href = location;
+      link.href = url;
       link.href = link.href;
       return link.protocol == 'https:';
-    };
-
-    __exports__.isSecureUrl = isSecureUrl;
+    }
   });
-global.Ember.SimpleAuth = requireModule('ember-simple-auth');
+var initializer                   = requireModule('simple-auth/initializer').default;
+var Configuration                 = requireModule('simple-auth/configuration').default;
+var Session                       = requireModule('simple-auth/session').default;
+var BaseAuthenticator             = requireModule('simple-auth/authenticators/base').default;
+var BaseAuthorizer                = requireModule('simple-auth/authorizers/base').default;
+var BaseStore                     = requireModule('simple-auth/stores/base').default;
+var LocalStorageStore             = requireModule('simple-auth/stores/local-storage').default;
+var EphemeralStore                = requireModule('simple-auth/stores/ephemeral').default;
+var flatObjectsAreEqual           = requireModule('simple-auth/utils/flat-objects-are-equal').default;
+var isSecureUrl                   = requireModule('simple-auth/utils/is-secure-url').default;
+var getGlobalConfig               = requireModule('simple-auth/utils/get-global-config').default;
+var ApplicationRouteMixin         = requireModule('simple-auth/mixins/application-route-mixin').default;
+var AuthenticatedRouteMixin       = requireModule('simple-auth/mixins/authenticated-route-mixin').default;
+var AuthenticationControllerMixin = requireModule('simple-auth/mixins/authentication-controller-mixin').default;
+var LoginControllerMixin          = requireModule('simple-auth/mixins/login-controller-mixin').default;
+
+global.SimpleAuth = {
+  Configuration: Configuration,
+
+  Session: Session,
+
+  Authenticators: {
+    Base: BaseAuthenticator
+  },
+
+  Authorizers: {
+    Base: BaseAuthorizer
+  },
+
+  Stores: {
+    Base:         BaseStore,
+    LocalStorage: LocalStorageStore,
+    Ephemeral:    EphemeralStore
+  },
+
+  Utils: {
+    flatObjectsAreEqual: flatObjectsAreEqual,
+    isSecureUrl:         isSecureUrl,
+    getGlobalConfig:     getGlobalConfig
+  },
+
+  ApplicationRouteMixin:         ApplicationRouteMixin,
+  AuthenticatedRouteMixin:       AuthenticatedRouteMixin,
+  AuthenticationControllerMixin: AuthenticationControllerMixin,
+  LoginControllerMixin:          LoginControllerMixin
+};
+
+requireModule('simple-auth/ember');
 })((typeof global !== 'undefined') ? global : window);

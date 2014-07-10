@@ -12,15 +12,16 @@ content security policies enforced in the Chrome App platform the main one
 being that Handlebars (and indeed most templating libraries) do not fit in with
 the content security policies enforced in the Chrome App platform. By
 pre-compiling Handlebars templates into their respective functions, we can
-avoid the use of on-the-fly compilation when we run the app.
+avoid restrictions around the use of `eval` and function creation at runtime,
+which are prohibited by the policies mentioned.
 
-Another reason is that we've chosen to use CoffeeScript as the dialect of
-choice, after discovering that in this Chrome ecosystem with its asynchronous
-design things can become noisy due to the mess of brackets/braces left behind.
+Additionally, we've chosen to use CoffeeScript as the dialect of choice, after
+finding that with the Chrome APIs and their liberal use of callbacks, things
+can noisy as a result of the mess of brackets/braces left behind.
 
 ## Building the App
 
-This is relatively simple. After installing the dev dependencies...
+After installing the dev dependencies...
 
     $ npm install
 
@@ -30,6 +31,8 @@ This is relatively simple. After installing the dev dependencies...
 whenever part of the functional source changes
 
     $ gulp
+
+(specs are yet to be included)
 
 **run the autobuild task** which watches the source directory, compiling and
 assembling the app as changes are made to the source files that require
