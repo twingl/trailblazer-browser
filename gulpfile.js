@@ -89,6 +89,8 @@ var locations = {
     scripts   : [
       'app/initializers/**/*.coffee',
       'app/boot.coffee',
+      'app/adapters/**/*.coffee',
+      'app/models/**/*.coffee',
       'app/controllers/**/*.coffee',
       'app/views/**/*.coffee',
       'app/routes/**/*.coffee',

@@ -1,11 +1,3 @@
-###
-# Configure SimpleAuth
-###
-window.ENV ||= {}
-window.ENV['simple-auth'] =
-  store:      'simple-auth-session-store:ephemeral'
-  authorizer: 'simple-auth-authorizer:oauth2-bearer'
-
 OAuth2Authenticator = SimpleAuth.Authenticators.Base.extend
   restore: (properties) ->
 

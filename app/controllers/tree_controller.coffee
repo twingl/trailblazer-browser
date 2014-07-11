@@ -8,7 +8,8 @@
 #
 # NOTE: `visited` log is not currently implemented fully
 Twingl.TreeController = Ember.Controller.extend
-  needs: ['navigation']
+  needs: ['application', 'navigation']
+  application: Ember.computed.alias "controllers.application"
   navigation: Ember.computed.alias "controllers.navigation"
 
   resetState: ->

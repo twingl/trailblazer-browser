@@ -1,3 +1,13 @@
+###
+# Configure SimpleAuth
+###
+window.ENV ||= {}
+window.ENV['simple-auth'] =
+  store:      'simple-auth-session-store:ephemeral'
+  authorizer: 'simple-auth-authorizer:oauth2-bearer'
+  crossOriginWhitelist: ['http://localhost:3000']
+
+
 window.Twingl = Ember.Application.create
   rootElement: "#app"
 
