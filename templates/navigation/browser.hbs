@@ -1,13 +1,14 @@
 <nav {{bind-attr class="loading"}}>
   <ul>
     <li class="tb-navigation-element-main">{{view Twingl.HistoryShowButton}}</li>
-    <li class="tb-navigation-element-main">{{view Twingl.HistoryBackButton}}</li>
-    <li class="tb-navigation-element-main">{{view Twingl.HistoryForwardButton}}</li>
-    <li class="tb-navigation-element-main">{{view Twingl.HistoryReloadButton}}</li>
-    <li class="tb-navigation-element-main">{{view Twingl.UrlTextField value=url}}{{view Twingl.UrlSubmitButton}}</li>
+    <li class="tb-navigation-element-main">{{view Twingl.SearchButton}}</li>
 
     <li class="tb-navigation-element-alt">{{view Twingl.BrowserShowButton}}</li>
+  </ul>
 
+  <span class="flex"></span>
+
+  <ul>
     <li class="tb-navigation-element-main">{{view Twingl.LogoutButton}}</li>
   </ul>
 </nav>
