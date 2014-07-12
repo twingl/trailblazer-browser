@@ -1,6 +1,6 @@
 Twingl.LogoutButton = Ember.Component.extend
   tagName   : 'button'
-  classNames: [ 't-auth-logout', 't-nav-button' ]
+  classNames: [ 'tb-auth-logout', 'tb-nav-button' ]
   action    : "invalidateSession"
   layoutName: "button"
   text      : "Logout"

@@ -98,17 +98,17 @@ Twingl.NavigationController = Ember.Controller.extend
     # Hides the browser and shows the trail view
     historyShow: ->
       @set 'loading', false
-      $('#t-pane-alt').show()
-      $('.t-navigation-element-main').hide()
-      $('.t-navigation-element-alt').show 0, =>
+      $('#tb-pane-alt').show()
+      $('.tb-navigation-element-main').hide()
+      $('.tb-navigation-element-alt').show 0, =>
         @get('tree').send('drawTree')
 
 
     # Hides the trail view and shows the browser
     browserShow: ->
-      $('#t-pane-alt').hide()
-      $('.t-navigation-element-main').show()
-      $('.t-navigation-element-alt').hide()
+      $('#tb-pane-alt').hide()
+      $('.tb-navigation-element-main').show()
+      $('.tb-navigation-element-alt').hide()
 
     ###
     # Filtered <webview> instigated events

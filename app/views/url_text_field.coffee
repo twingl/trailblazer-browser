@@ -1,5 +1,5 @@
 Twingl.UrlTextField = Ember.TextField.extend
-  classNames  : [ 't-url-input' ]
+  classNames  : [ 'tb-url-input' ]
   placeholder : 'http://example.com'
   action      : "navigateUrl"
   attributeBindings: ['value']

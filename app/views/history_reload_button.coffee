@@ -1,6 +1,6 @@
 Twingl.HistoryReloadButton = Ember.Component.extend
   tagName   : 'button'
-  classNames: [ 't-history-reload', 't-nav-button' ]
+  classNames: [ 'tb-history-reload', 'tb-nav-button' ]
   action    : "navigateReload"
   layoutName: "button"
   text      : "Reload"

@@ -1,6 +1,6 @@
 Twingl.UrlSubmitButton = Ember.Component.extend
   tagName   : 'button'
-  classNames: [ 't-url-submit', 't-nav-button' ]
+  classNames: [ 'tb-url-submit', 'tb-nav-button' ]
   action    : "navigateUrl"
   layoutName: "button"
   text      : "Go"

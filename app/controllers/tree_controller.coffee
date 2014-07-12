@@ -95,13 +95,13 @@ Twingl.TreeController = Ember.Controller.extend
 
   actions:
     drawTree: ->
-      document.getElementById('t-history-tree-viz').innerHTML = ''
-      @get('d3data').svg = d3.select('#t-history-tree-viz')
+      document.getElementById('tb-history-tree-viz').innerHTML = ''
+      @get('d3data').svg = d3.select('#tb-history-tree-viz')
                     .append('svg')
 
       if @get('historyTree')
         @update()
-        svgPanZoom.init({ 'selector': '#t-history-tree-viz>svg' })
+        svgPanZoom.init({ 'selector': '#tb-history-tree-viz>svg' })
 
     newRoot: (obj) ->
       node =

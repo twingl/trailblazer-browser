@@ -1,6 +1,6 @@
 Twingl.HistoryBackButton = Ember.Component.extend
   tagName   : 'button'
-  classNames: [ 't-history-back', 't-nav-button' ]
+  classNames: [ 'tb-history-back', 'tb-nav-button' ]
   action    : "navigateHistoryBack"
   layoutName: "button"
   text      : "Back"
