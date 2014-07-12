@@ -1,6 +1,6 @@
 nav {
+  -webkit-app-region: no-drag;
   position: absolute;
-  top     : 0;
   width   : 100%;
 
   &.loading { background: red; }
@@ -25,4 +25,57 @@ nav {
 
 .tb-url-input {
   width: 400px;
+}
+
+/*----------------------------------*\
+ *  Window Controls
+\*----------------------------------*/
+#tb-navigation-window {
+  ul {
+    &, li {
+      border : 0;
+      padding: 0;
+      margin : 0;
+    }
+
+    li {
+      display        : inline;
+      list-style-type: none;
+      height         : 24px;
+    }
+  }
+
+  .left  { float: left; }
+  .right { float: right; }
+
+  .left:after, .right:after { clear: both; }
+
+  .tb-window-control {
+    -webkit-app-region: no-drag;
+    width         : 30px;
+    height        : 24px;
+    padding-left  : 4px;
+    padding-right : 4px;
+
+    line-height   : 26px;
+    text-align    : center;
+    vertical-align: top;
+
+    color       : rgba(255, 255, 255, 0.57);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color     : rgba(255, 255, 255, 0.7);
+    }
+
+    // Manual tweaking of the icon alignment #pixelpushing
+    &.fa:before {
+      position: relative;
+      top     : -1px;
+    }
+
+    &.fa.fa-minus:before { font-size: 15px; }
+    &.fa.fa-plus:before  { font-size: 15px; } 
+    &.fa.fa-times:before { font-size: 16px; }
+  }
 }

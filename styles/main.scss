@@ -9,32 +9,41 @@ html, body, body>div {
   position: relative;
   width   : 100%;
   height  : 100%;
+  background: #fafafa; // Some window decorators don't drop shadows behind windows
 
+  #tb-navigation-window,
   #tb-navigation-main {
-    height: 30px;
+    -webkit-app-region: drag;
     width : 100%;
   }
 
-  #tb-pane-main {
+  #tb-navigation-window {
+    background: #ef6c00;
+    height: 24px;
+  }
+
+  #tb-navigation-main {
+    background: #ff9800;
+    height: 40px;
+  }
+
+  #tb-pane-main,
+  #tb-pane-alt {
     position: absolute;
-    top     : 30px;
+    top     : 64px;
     bottom  : 0;
     left    : 0;
     right   : 0;
     width   : auto;
     height  : auto;
+  }
+
+  #tb-pane-main {
     z-index : 1;
   }
 
   #tb-pane-alt {
-    position: absolute;
     display : none;
-    top     : 30px;
-    bottom  : 0;
-    left    : 0;
-    right   : 0;
-    width   : auto;
-    height  : auto;
     z-index : 10;
   }
 }

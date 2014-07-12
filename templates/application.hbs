@@ -1,5 +1,16 @@
 <div id="tb-ui-primary">
-  <div id="tb-navigation-window">{{outlet windowNavigation}}</div>
+  <div id="tb-navigation-window">
+    <div class="left">
+      {{outlet windowNavigation}}
+    </div>
+    <div class="right">
+      <ul class="actions">
+        <li>{{view Twingl.WindowMinimizeButton}}</li>
+        <li>{{view Twingl.WindowMaximizeButton}}</li>
+        <li>{{view Twingl.WindowCloseButton}}</li>
+      </ul>
+    </div>
+  </div>
   <div id="tb-navigation-main">{{outlet navigation}}</div>
   <div id="tb-pane-main">{{outlet}}</div>
   <div id="tb-pane-alt">{{outlet alt}}</div>
