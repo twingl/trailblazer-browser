@@ -43,11 +43,11 @@
     text-align    : center;
     vertical-align: top;
 
-    color       : rgba(255, 255, 255, 0.57);
+    color       : rgba(0, 0, 0, 0.57);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color     : rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.2);
+      color     : rgba(0, 0, 0, 0.7);
     }
 
     // Manual tweaking of the icon alignment #pixelpushing
@@ -105,11 +105,11 @@
     vertical-align: top;
     cursor        : pointer;
 
-    color       : rgba(255, 255, 255, 0.57);
+    color       : rgba(0, 0, 0, 0.57);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color     : rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.2);
+      color     : rgba(0, 0, 0, 0.7);
     }
   }
 }
