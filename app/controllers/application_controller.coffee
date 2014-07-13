@@ -7,6 +7,8 @@ Twingl.ApplicationController = Ember.Controller.extend
     # Navigate back to the assignments view
     showAssignments: ->
       @set 'assignment', undefined
+      @get("controllers.tree").resetState()
+      @get("controllers.webview").resetState()
       @transitionToRoute('assignments')
 
     resetState: ->
