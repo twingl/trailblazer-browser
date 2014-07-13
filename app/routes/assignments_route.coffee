@@ -3,7 +3,7 @@ Twingl.AssignmentsRoute = Ember.Route.extend SimpleAuth.AuthenticatedRouteMixin,
     @store.findAll('assignment')
 
   renderTemplate: ->
-    @render 'assignments/index',
+    @render 'main/assignments/index',
       outlet: 'main'
       controller: 'assignments'
 

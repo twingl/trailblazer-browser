@@ -32,6 +32,27 @@
     }
   }
 
+  .tb-window-nav {
+    -webkit-app-region: no-drag;
+    height        : 24px;
+    line-height   : 24px;
+
+    &.tb-assignment-switch {
+      font-family : "RobotoDraft";
+      font-size   : 13px;
+      cursor      : pointer;
+      border      : 0;
+
+      color       : rgba(0, 0, 0, 0.57);
+      background  : none;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color     : rgba(0, 0, 0, 0.7);
+      }
+    }
+  }
+
   .tb-window-control {
     -webkit-app-region: no-drag;
     width         : 30px;
