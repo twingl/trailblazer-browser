@@ -1,0 +1,70 @@
+#tb-assignments {
+  height  : 100%;
+  width   : 100%;
+  overflow: auto;
+
+  h1 {
+    text-align  : center;
+    font-size   : 3em;
+    font-weight : 300;
+    color       : rgba(0, 0, 0, 0.57);
+  }
+
+  p {
+    text-align: center;
+    font-size : 15px;
+    color     : rgba(0, 0, 0, 0.34);
+  }
+
+  ul {
+    border  : 0;
+    margin  : 0;
+    padding : 0 0 24px 0;
+
+    list-style-type: none;
+
+    li {
+      position  : relative;
+      width     : 400px;
+      min-height: 80px;
+      margin    : 12px auto;
+      padding   : 12px;
+      cursor    : pointer;
+
+      color           : rgba(0, 0, 0, 0.72);
+      background-color: #fff;
+
+      transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+
+      &:hover {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.26);
+        transition-delay: 0.2s;
+      }
+
+      .name, .description {
+        color: rgba(0, 0, 0, 0.57);
+      }
+
+      .name {
+        font-size: 2em;
+      }
+
+      .description {
+        font-size    : 1.2em;
+        font-weight  : 400;
+        margin-bottom: 16px;
+      }
+
+      .dates {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+
+        font-style: italic;
+
+        color: rgba(0, 0, 0, 0.26);
+      }
+    }
+  }
+}

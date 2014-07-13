@@ -7,6 +7,6 @@ Twingl.AssignmentsRoute = Ember.Route.extend SimpleAuth.AuthenticatedRouteMixin,
       outlet: 'main'
       controller: 'assignments'
 
-    @render 'navigation/browser',
+    @render 'navigation/assignments',
       outlet: 'navigation'
       controller: 'navigation'

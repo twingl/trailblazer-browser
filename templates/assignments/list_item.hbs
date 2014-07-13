@@ -1,1 +1,23 @@
-{{assignment.id}}: {{assignment.name}} - {{assignment.description}}
+{{#if assignment.name}}
+  <div class="name">{{assignment.name}}</div>
+{{else}}
+  <div class="name">Untitled</div>
+{{/if}}
+
+{{#if assignment.description}}
+  <div class="description">{{assignment.description}}</div>
+{{else}}
+  <div class="description">No description</div>
+{{/if}}
+
+<div class="dates">
+  {{#if assignment.started_at}}
+    <span class="started">Started at {{assignment.started_at}}</span>
+  {{else}}
+    <span class="started">Not yet started</span>
+  {{/if}}
+
+  {{#if assignment.completed_at}}
+    <span class="completed">completed at {{assignment.completed_at}}</span>
+  {{/if}}
+</div>
