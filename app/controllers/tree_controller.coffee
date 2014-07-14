@@ -94,6 +94,10 @@ Twingl.TreeController = Ember.Controller.extend
 
 
   actions:
+    loadHistory: (cb) ->
+      #TODO Load history
+      setTimeout cb, 1000
+
     drawTree: ->
       document.getElementById('tb-history-tree-viz').innerHTML = ''
       @get('d3data').svg = d3.select('#tb-history-tree-viz')

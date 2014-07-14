@@ -1,0 +1,3 @@
+[submodule "APP_ROOT/vendor/polymer_components/loading-spinner"]
+	path = APP_ROOT/vendor/polymer_components/loading-spinner
+	url = git@github.com:twingl/loading-spinner.git
