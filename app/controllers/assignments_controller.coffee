@@ -4,5 +4,5 @@ Twingl.AssignmentsController = Ember.Controller.extend
   actions:
     setAssignment: (assignment) ->
       @get("controllers.application").set("assignment", assignment)
-      @get("controllers.tree").send 'loadHistory', => @transitionToRoute('browser')
       @transitionToRoute('loading')
+      @get("controllers.tree").send 'loadHistory', => @transitionToRoute('browser')

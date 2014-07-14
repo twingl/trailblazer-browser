@@ -1,3 +1,3 @@
 Twingl.ApplicationAdapter = DS.RESTAdapter.extend
-  namespace: 'api/v1'
-  host: 'http://localhost:3000'
+  namespace: window.ENV['api_namespace']
+  host:      window.ENV['api_host']

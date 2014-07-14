@@ -1,25 +1,27 @@
-# Responsible for the Trail interface.
+# Responsible for the Trail.
 #
-# This controller stores the history tree in memory, and is responsible for
-# rendering it using D3 and handling interface events invoked from within the
-# trail view.
+# Receives commands from the webview controller and mutates the tree based on
+# those. Commands received from the webview are additive - they do not remove
+# parts of the tree.
 #
-# This controller is very much a work in progress
-#
-# NOTE: `visited` log is not currently implemented fully
+# Responsible for structuring the data such that it can be persisted on the API
+# and rendered in the browser.
 Twingl.TreeController = Ember.Controller.extend
-  needs: ['application', 'navigation']
+  needs: ['application', 'navigation', 'webview']
   application: Ember.computed.alias "controllers.application"
   navigation: Ember.computed.alias "controllers.navigation"
+  webview: Ember.computed.alias "controllers.webview"
+
+  assignment: Ember.computed.alias "controllers.application.assignment"
+
+  history: []
 
   resetState: ->
     @set 'currentNode',   {}
     @set 'historyStack',  []
-    @set 'curretnNodeId', 0
+    @set 'currentNodeId', 0
 
   currentNode: {}
-
-  historyStack: []
 
   currentNodeId: 0
 
@@ -28,28 +30,13 @@ Twingl.TreeController = Ember.Controller.extend
   #
   # {
   #   id: ID,
-  #   root: Boolean, //Indicates if the item is a root item or direct child
-  #   parent: ID,
-  #   children: [ ... ],
-  #   visited: [
-  #     {
-  #       start: Date,
-  #       finish: Date,
-  #       idle: Boolean
-  #     },
-  #     ...
-  #   ],
-  #   url: String,
-  #   created_at: Date
-  # }
-  # {
-  #   id: ID,
   #   url: String,
   #   title: String,
   #   arrived_at: Date,
   #   departed_at: Date,
   #   idle: Boolean
   # }
+  #
   ###
 
   historyTree: undefined
@@ -95,8 +82,19 @@ Twingl.TreeController = Ember.Controller.extend
 
   actions:
     loadHistory: (cb) ->
-      #TODO Load history
-      setTimeout cb, 1000
+      id  = @get('assignment').get('id')
+      url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
+
+      Ember.$.get url, (response) =>
+        if response.nodes.length is 0
+          # we have an empty project - send us to the home page
+          @get('webview').navigate(window.ENV['default_page'])
+        else
+          # open the trail view
+          # TODO set the current page to [current_node_id]
+          @set 'history', response.nodes
+          @get('navigation').send('historyShow')
+        cb()
 
     drawTree: ->
       document.getElementById('tb-history-tree-viz').innerHTML = ''
@@ -170,20 +168,3 @@ Twingl.TreeController = Ember.Controller.extend
         node.visited.push { start: Date.now(), finish: undefined, idle: false }
         @set('currentNode', node)
         console.log "Advancing to existing node: #{obj.url}"
-
-    historyPop: ->
-      p = @get('historyStack').pop()
-      if p
-        @set('currentNode', p)
-        console.log "Pop - moving forward one node"
-      else
-        console.log "ohfuck no history to go to"
-
-    historyPush: ->
-      p = @get('currentNode').parent
-      if p
-        @get('historyStack').push @get('currentNode')
-        @set('currentNode', p)
-        console.log "Push - moving back one node"
-      else
-        console.log "ohfuck no parent"

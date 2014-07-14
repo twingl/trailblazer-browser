@@ -2,10 +2,18 @@
 # Configure SimpleAuth
 ###
 window.ENV ||= {}
+
+window.ENV['default_page'] = "http://google.com"
+
+window.ENV['api_host'] = "http://localhost:3000"
+window.ENV['api_namespace'] = "api/v1"
+
+window.ENV['api_base'] = "#{window.ENV['api_host']}/#{window.ENV['api_namespace']}"
+
 window.ENV['simple-auth'] =
   store:      'simple-auth-session-store:ephemeral'
   authorizer: 'simple-auth-authorizer:oauth2-bearer'
-  crossOriginWhitelist: ['http://localhost:3000']
+  crossOriginWhitelist: [ window.ENV['api_host'] ]
 
 
 window.Twingl = Ember.Application.create
