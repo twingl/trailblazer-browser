@@ -80,6 +80,7 @@ Twingl.TreeController = Ember.Controller.extend
 
       node = Ember.$.extend node,
         id:         temporaryId
+        parent_id:  @get('currentNodeId')
         arrived_at: (new Date()).toISOString()
         idle:       false
 
@@ -87,6 +88,13 @@ Twingl.TreeController = Ember.Controller.extend
         node.id = response.id
         @get("historyMap")[node.id] = node
         delete @get("historyMap")[temporaryId]
+
+        @set "currentNodeId", node.id
+        url = "#{window.ENV['api_base']}/assignments/#{id}"
+        Ember.$.ajax url,
+          method: "PUT"
+          data:
+            assignment: { current_node_id: node.id }
 
       @get("historyStack").push(node)
       @get("historyMap")[node.id] = node
@@ -109,3 +117,10 @@ Twingl.TreeController = Ember.Controller.extend
       @get("historyStack").push(node)
       @get("historyMap")[node.id] = node
       console.log @get('historyStack'), @get('historyMap')
+
+    ###
+    # Rendering the graph
+    ###
+    drawTree: ->
+      console.log "drawTree"
+
