@@ -63,7 +63,9 @@ Twingl.TreeController = Ember.Controller.extend
           else
             @set 'currentNodeId', @get('historyStack').filterBy("arrived_at")[0].id
 
-          @get('navigation').send('historyShow')
+          # Navigation elements fail to hide/show if run without a slight delay
+          setTimeout ( => @get('navigation').send('historyShow')), 40
+
           @get('webview').navigate @currentNode().url, false
         else
           # we have an empty project - send us to the home page
