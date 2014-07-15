@@ -9,6 +9,8 @@ Twingl.WebviewController = Ember.Controller.extend
   navigation: Ember.computed.alias "controllers.navigation"
   tree:       Ember.computed.alias "controllers.tree"
 
+  currentNode: Ember.computed.alias "controllers.tree.currentNode"
+
   resetState: ->
     @set 'url', ''
     @set 'state',   undefined
@@ -27,18 +29,12 @@ Twingl.WebviewController = Ember.Controller.extend
 
   states:
     default     : 0
-    nav_url     : 1
-    nav_tree    : 2
-    nav_browser : 3
+    nav_tree    : 1
+    nav_browser : 2
 
 
   updateTree: (node) ->
     switch @state
-      when @states.nav_url
-        console.log("nav_url")
-        @get('tree').send 'newRoot', { url: node.url, title: node.title }
-        @state = @states.default
-
       when @states.nav_tree
         console.log("nav_tree")
         @state = @states.default
@@ -47,16 +43,17 @@ Twingl.WebviewController = Ember.Controller.extend
         console.log("nav_browser")
         @state = @states.default
 
-      else #default
+      else #default browsing mode
         console.log("nav_default")
-        @get('tree').send 'advance', { url: node.url, title: node.title }
+        @get('tree').send 'pushItem', { url: node.url, title: node.title }
         @state = @states.default
-
-  currentNode: Ember.computed.alias "controllers.tree.currentNode"
 
   url: ''
 
-  navigate:  (url) -> @set 'url', url
+  navigate: (url, triggerNewNode = true) ->
+    if !triggerNewNode then @set('state', @states.nav_tree)
+    @set 'url', url # FIXME Attribute binding doesn't work consistently
+    Ember.$('webview').attr('src', url)
 
   navigateForward: -> $('webview')[0].forward()
   navigateBack:    -> $('webview')[0].back()
@@ -79,11 +76,9 @@ Twingl.WebviewController = Ember.Controller.extend
     # Only effected on top-level events.
     loadCommit: (e) ->
       if e.originalEvent.isTopLevel and @get('currentNode').url != e.originalEvent.url
-        $('webview')[0].executeScript code: "document.title", (r) =>
-          document.title = r[0]
+        Ember.$('webview')[0].executeScript code: "document.title", (r) =>
           e.originalEvent.title = r[0]
           @updateTree e.originalEvent
-          console.log "loadCommit", @get('tree').get('currentNode'), @get 'state'
           @get('navigation').set 'url', e.originalEvent.url
 
     # Updates the URL that is displayed without tracking this redirect in the
@@ -97,4 +92,4 @@ Twingl.WebviewController = Ember.Controller.extend
     # Emitted when a new window/tab is opened - i.e. when a person middle
     # clicks on a link
     newWindow: (e) ->
-      @get('tree').send 'newChild', { url: e.originalEvent.targetUrl, title: e.originalEvent.targetUrl }
+      @get('tree').send 'queueUnread', { url: e.originalEvent.targetUrl }

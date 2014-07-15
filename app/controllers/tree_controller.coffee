@@ -14,22 +14,25 @@ Twingl.TreeController = Ember.Controller.extend
 
   assignment: Ember.computed.alias "controllers.application.assignment"
 
-  history: []
+  # Temporary IDs, i.e. those that are client-assigned before a response is
+  # received from the server, are of the form TB.tmp.<random token>
+  historyStack: []
+  historyMap:   {}
 
   resetState: ->
-    @set 'currentNode',   {}
-    @set 'historyStack',  []
-    @set 'currentNodeId', 0
+    @set "currentNodeId", undefined
+    @set "historyStack",  []
+    @set "historyMap",    {}
 
-  currentNode: {}
-
-  currentNodeId: 0
+  currentNodeId: undefined
+  currentNode: ->
+    @get("historyMap")[@get("currentNodeId")]
 
   ###
   # A sample node structure
   #
   # {
-  #   id: ID,
+  #   id: ID, (assigned a temporary ID before the persisted ID is known)
   #   url: String,
   #   title: String,
   #   arrived_at: Date,
@@ -38,47 +41,8 @@ Twingl.TreeController = Ember.Controller.extend
   # }
   #
   ###
-
-  historyTree: undefined
-
-  d3data:
-    svg     : undefined
-    height  : 800
-    width   : 600
-    tree    : d3.layout.tree().size( [800, 600] )
-    diagonal: d3.svg.diagonal().projection((d) -> [d.y, d.x])
-
-  update: () ->
-    nodes = @get('d3data').tree.nodes(@get('historyTree')).reverse()
-    links = @get('d3data').tree.links(nodes)
-
-    node = @get('d3data').svg.selectAll('g.node').data( nodes, (d) -> d.id )
-
-    nodeEnter = node.enter()
-             .append("g")
-              .attr("class", "node")
-              .attr("transform", (d) -> "translate(#{d.y}, #{d.x})")
-              .on "click", (d) =>
-                @set 'currentNode', d
-                @get('navigation').send('navigateNode', d.url)
-
-    nodeEnter.append("circle")
-              .attr("r", "4px")
-              .style("fill", "red")
-
-    nodeEnter.append("text")
-              .attr("x", -10)
-              .attr("dy", ".35em")
-              .attr("text-anchor", "end")
-              .text( (d) -> d.title )
-
-    link = @get('d3data').svg.selectAll("path.link").data( links, (d) -> d.target.id )
-
-    link.enter().insert("path", "g")
-                  .attr("class", "link")
-                  .attr("d", @get('d3data').diagonal)
-
-
+  generateTemporaryId: ->
+    "TB.tmp." + Math.random().toString(36).substr(2, 9)
 
   actions:
     loadHistory: (cb) ->
@@ -86,85 +50,60 @@ Twingl.TreeController = Ember.Controller.extend
       url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
 
       Ember.$.get url, (response) =>
-        if response.nodes.length is 0
-          # we have an empty project - send us to the home page
-          @get('webview').navigate(window.ENV['default_page'])
-        else
+        if response.nodes.length > 0
           # open the trail view
           # TODO set the current page to [current_node_id]
-          @set 'history', response.nodes
+          for node in response.nodes
+            @get('historyStack').push node
+            @get('historyMap')[node.id] = node
+
+          currentNodeId = @get('assignment').get('current_node_id')
+          if currentNodeId and @get('historyMap').hasOwnProperty(currentNodeId)
+            @set 'currentNodeId', @get('assignment').get('current_node_id')
+          else
+            @set 'currentNodeId', @get('historyStack').filterBy("arrived_at")[0].id
+
           @get('navigation').send('historyShow')
+          @get('webview').navigate @currentNode().url, false
+        else
+          # we have an empty project - send us to the home page
+          @get('webview').navigate(window.ENV['default_page'])
+        console.log @get('historyStack'), @get('historyMap')
         cb()
 
-    drawTree: ->
-      document.getElementById('tb-history-tree-viz').innerHTML = ''
-      @get('d3data').svg = d3.select('#tb-history-tree-viz')
-                    .append('svg')
+    pushItem: (node) ->
+      id  = @get('assignment').get('id')
+      url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
+      temporaryId = @generateTemporaryId()
 
-      if @get('historyTree')
-        @update()
-        svgPanZoom.init({ 'selector': '#tb-history-tree-viz>svg' })
+      node = Ember.$.extend node,
+        id:         temporaryId
+        arrived_at: (new Date()).toISOString()
+        idle:       false
 
-    newRoot: (obj) ->
-      node =
-        id        : ++@currentNodeId
-        root      : true
-        parent    : undefined
-        children  : []
-        visited   : [ { start: Date.now(), finish: undefined, idle: false } ]
-        url       : obj.url
-        title     : obj.title
-        created_at: Date.now()
+      Ember.$.post url, {node: node}, (response) =>
+        node.id = response.id
+        @get("historyMap")[node.id] = node
+        delete @get("historyMap")[temporaryId]
 
-      if !@get('historyTree')
-        @set('historyTree', node)
-        @set('currentNode', node)
-        console.log "New Root! #{obj.url}"
-      else
-        node.parent = @get('currentNode')
-        @get('currentNode').children ||= []
-        @get('currentNode').children.push node
-        @set('currentNode', node)
-        console.log "Creating new pseudo-root node: #{obj.url}"
+      @get("historyStack").push(node)
+      @get("historyMap")[node.id] = node
+      console.log @get('historyStack'), @get('historyMap')
 
-    newChild: (obj) ->
-      @get('currentNode').children ||= []
-      if @get('currentNode').children.filterBy('url', obj.url).length is 0
-        node =
-          id        : ++@currentNodeId
-          root      : false
-          parent    : @get('currentNode')
-          children  : []
-          visited   : []
-          url       : obj.url
-          title     : obj.title
-          created_at: Date.now()
+    queueUnread: (node) ->
+      id  = @get('assignment').get('id')
+      url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
+      temporaryId = @generateTemporaryId()
 
-        @get('currentNode').children.push(node)
-        console.log "Creating child node: #{obj.url}"
-      else
-        console.log "Child node exists: #{obj.url}"
+      node = Ember.$.extend node,
+        id:         temporaryId
+        idle:       false
 
-    advance: (obj) ->
-      # check if url is a direct descendent - create new if not, otherwise move to child
-      @get('currentNode').children ||= []
-      if @get('currentNode').children.filterBy('url', obj.url).length is 0
-        node =
-          id        : ++@currentNodeId
-          root      : false
-          parent    : @get('currentNode')
-          children  : []
-          visited   : [ { start: Date.now(), finish: undefined, idle: false } ]
-          url       : obj.url
-          title     : obj.title
-          created_at: Date.now()
+      Ember.$.post url, {node: node}, (response) =>
+        node.id = response.id
+        @get("historyMap")[node.id] = node
+        delete @get("historyMap")[temporaryId]
 
-        @get('currentNode').children ||= []
-        @get('currentNode').children.push(node)
-        @set('currentNode', node)
-        console.log "Advancing to new node: #{obj.url}"
-      else
-        node = @get('currentNode').children.filterBy('url', obj.url).pop()
-        node.visited.push { start: Date.now(), finish: undefined, idle: false }
-        @set('currentNode', node)
-        console.log "Advancing to existing node: #{obj.url}"
+      @get("historyStack").push(node)
+      @get("historyMap")[node.id] = node
+      console.log @get('historyStack'), @get('historyMap')
