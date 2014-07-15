@@ -26,6 +26,9 @@ Twingl.NavigationController = Ember.Controller.extend
     navigateUrl: ->
       @get('webview').navigate(@get('url'))
 
+    navigateSearch: ->
+      @get('webview').navigate(window.ENV['search_page'])
+
     # Reloads the current page
     navigateReload: ->
       @get('webview').reload()
