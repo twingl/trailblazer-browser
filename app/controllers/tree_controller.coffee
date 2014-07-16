@@ -117,6 +117,7 @@ Twingl.TreeController = Ember.Controller.extend
 
       node = Ember.$.extend node,
         id:         temporaryId
+        parent_id: @get('currentNodeId')
         idle:       false
 
       Ember.$.post url, {node: node}, (response) =>
