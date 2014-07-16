@@ -41,6 +41,19 @@ Twingl.TreeController = Ember.Controller.extend
                        .friction 0.95
                        .gravity 0
 
+  updateCurrentNode: (node) ->
+    @set "currentNodeId", node.id
+    id  = @get('assignment').get('id')
+    Ember.$.ajax "#{window.ENV['api_base']}/assignments/#{id}",
+      method: "PUT"
+      data:
+        assignment: { current_node_id: node.id }
+
+    unless node.visited_at
+      Ember.$.ajax url = "#{window.ENV['api_base']}/nodes/#{node.id}",
+        method: "PUT"
+        data:
+          node: { arrived_at: (new Date()).toISOString() }
   ###
   # A sample node structure
   #
@@ -102,12 +115,7 @@ Twingl.TreeController = Ember.Controller.extend
         @get("historyMap")[node.id] = node
         delete @get("historyMap")[temporaryId]
 
-        @set "currentNodeId", node.id
-        url = "#{window.ENV['api_base']}/assignments/#{id}"
-        Ember.$.ajax url,
-          method: "PUT"
-          data:
-            assignment: { current_node_id: node.id }
+        @updateCurrentNode(node)
 
       @get("historyStack").push(node)
       @get("historyMap")[node.id] = node
@@ -192,6 +200,10 @@ Twingl.TreeController = Ember.Controller.extend
               .data( nodes, (d) -> d.id )
               .enter().append("g")
                       .attr("class", "node")
+
+    node.on "click", (d) =>
+      @updateCurrentNode(d)
+      @get('webview').navigate d.url, false
 
     poly = node.append("polygon")
                .attr("stroke-linejoin", "round")
