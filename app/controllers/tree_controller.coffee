@@ -30,11 +30,8 @@ Twingl.TreeController = Ember.Controller.extend
 
   d3data:
     nodes:
-      color: "#ccc"
       size : 25
     svg     : undefined
-    height  : 1
-    width   : 1
     force   : d3.layout.force()
                        .size [100, 100]
                        .charge -1600
@@ -173,8 +170,8 @@ Twingl.TreeController = Ember.Controller.extend
       if node.parent_id
         links.push(source: idMap[node.parent_id], target: idMap[node.id])
       else
-        node.x = 0
-        node.y = 0
+        node.x = 50
+        node.y = 50
         node.fixed = true
       nodes.push node
 
@@ -190,7 +187,6 @@ Twingl.TreeController = Ember.Controller.extend
               .data(links)
               .enter().append("line")
                       .attr("class", "link")
-                      .style("stroke-width", 4)
 
     node = svg.selectAll('g.node')
               .data( nodes, (d) -> d.id )
@@ -198,10 +194,7 @@ Twingl.TreeController = Ember.Controller.extend
                       .attr("class", "node")
 
     poly = node.append("polygon")
-               .attr("stroke-width", "20")
                .attr("stroke-linejoin", "round")
-               .attr("stroke", @get("d3data").nodes.color)
-               .style("fill",  @get("d3data").nodes.color)
 
     #label = node.append("g")
     #            .attr("requiredFeatures", "http://www.w3.org/Graphics/SVG/feature/1.2/#TextFlow")
@@ -244,4 +237,3 @@ Twingl.TreeController = Ember.Controller.extend
 
       label.attr("x", (d) -> d.x-d.offsets.x)
            .attr("y", (d) -> d.y-d.offsets.y.minor)
-

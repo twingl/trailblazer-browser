@@ -6,6 +6,11 @@ html, body, body>div {
   font-family: "RobotoDraft";
 }
 
+.blur {
+  -webkit-filter: blur(5px);
+          filter: blur(5px);
+}
+
 #tb-ui-primary {
   position: relative;
   width   : 100%;
