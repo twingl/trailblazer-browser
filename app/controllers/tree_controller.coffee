@@ -35,8 +35,14 @@ Twingl.TreeController = Ember.Controller.extend
     svg     : undefined
     height  : 1
     width   : 1
-    force   : d3.layout.force().size( [1, 1] ).charge(-800).linkDistance(200).gravity(0)
-    diagonal: d3.svg.diagonal().projection((d) -> [d.y, d.x])
+    force   : d3.layout.force()
+                       .size [100, 100]
+                       .charge -1600
+                       .chargeDistance 1600
+                       .linkDistance 200
+                       .linkStrength 1
+                       .friction 0.95
+                       .gravity 0
 
   ###
   # A sample node structure
@@ -140,8 +146,9 @@ Twingl.TreeController = Ember.Controller.extend
         @update()
         svgPanZoom("#tb-history-tree-viz>svg",
           zoomScaleSensitivity: 0.2
-          minZoom:              0.005)
-        .zoomAtPoint(0.5, x: 0, y: 0)
+          minZoom:              0.005
+          maxZoom:              0.2)
+        .zoomAtPoint(0.2, x: 0, y: 0)
 
 
   update: ->
@@ -163,9 +170,13 @@ Twingl.TreeController = Ember.Controller.extend
         y:
           minor: @get('d3data').nodes.size * 1.1
           major: @get('d3data').nodes.size * 2.3
-      nodes.push node
       if node.parent_id
         links.push(source: idMap[node.parent_id], target: idMap[node.id])
+      else
+        node.x = 0
+        node.y = 0
+        node.fixed = true
+      nodes.push node
 
 
     force = @get('d3data').force
