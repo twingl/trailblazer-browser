@@ -18,6 +18,14 @@ svg {
       fill:         #9e9e9e; // Grey 500
       stroke:       #9e9e9e; // Grey 500
     }
+    &.current polygon {
+      fill:         #ff917b; // Trailblazer Orange
+      stroke:       #ff917b; // Trailblazer Orange
+    }
+    &.current:hover {
+      fill:         #ffa18b; // Trailblazer Orange Hover
+      stroke:       #ffa18b; // Trailblazer Orange Hover
+    }
 
     p {
       color:        rgba(255, 255, 255, 0.96);
@@ -28,7 +36,8 @@ svg {
       text-align:   center;
     }
 
-    &.unread p { color: rgba(0, 0, 0, 0.72); }
+    &.unread  p { color: rgba(0, 0, 0, 0.72); }
+    &.current p { color: rgba(0, 0, 0, 0.72); }
 
     &:hover {
       polygon {
