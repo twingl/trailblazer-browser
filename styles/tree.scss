@@ -8,6 +8,7 @@ svg {
   }
 
   .node {
+
     polygon {
       fill:         #3f51b5; // Indigo 500
       stroke:       #3f51b5; // Indigo 500
@@ -28,6 +29,24 @@ svg {
       font-size:    16px;
       line-height:  18px;
       text-align:   center;
+    }
+
+    &.unread {
+      p {
+        color:        rgba(0, 0, 0, 0.72);
+      }
+
+      polygon {
+        fill:         #9e9e9e; // Indigo 500
+        stroke:       #9e9e9e; // Indigo 500
+      }
+
+      &:hover {
+        polygon {
+          fill:       #5677fc; // Indigo 500
+          stroke:     #5677fc; // Indigo 500
+        }
+      }
     }
   }
 

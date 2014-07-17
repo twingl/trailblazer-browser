@@ -213,7 +213,7 @@ Twingl.TreeController = Ember.Controller.extend
     node = svg.selectAll('g.node')
               .data( nodes, (d) -> d.id )
               .enter().append("g")
-                      .attr("class", "node")
+                      .attr("class", (d) -> "node #{if !d.arrived_at then "unread"}")
 
     node.on "click", (d) =>
       @updateCurrentNode(d)
