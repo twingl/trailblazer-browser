@@ -53,11 +53,11 @@ Twingl.WebviewController = Ember.Controller.extend
   navigate: (url, triggerNewNode = true) ->
     if !triggerNewNode then @set('state', @states.nav_tree)
     @set 'url', url # FIXME Attribute binding doesn't work consistently
-    Ember.$('webview').attr('src', url)
+    Ember.$('#tb-pane-main webview').attr('src', url)
 
-  navigateForward: -> $('webview')[0].forward()
-  navigateBack:    -> $('webview')[0].back()
-  reload:          -> $('webview')[0].reload()
+  navigateForward: -> $('#tb-pane-main webview')[0].forward()
+  navigateBack:    -> $('#tb-pane-main webview')[0].back()
+  reload:          -> $('#tb-pane-main webview')[0].reload()
 
   # These are events emitted by the webview element as the user browses the
   # web.
@@ -76,7 +76,7 @@ Twingl.WebviewController = Ember.Controller.extend
     # Only effected on top-level events.
     loadCommit: (e) ->
       if e.originalEvent.isTopLevel and @get('currentNode').url != e.originalEvent.url
-        Ember.$('webview')[0].executeScript code: "document.title", (r) =>
+        Ember.$('#tb-pane-main webview')[0].executeScript code: "document.title", (r) =>
           e.originalEvent.title = r[0]
           @updateTree e.originalEvent
           @get('navigation').set 'url', e.originalEvent.url

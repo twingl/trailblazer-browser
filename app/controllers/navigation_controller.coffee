@@ -8,6 +8,7 @@ Twingl.NavigationController = Ember.Controller.extend
     @set 'loading', false
     @set 'url', ''
     $('#tb-pane-alt').hide()
+    $('#tb-pane-main').removeClass('blur')
     $('.tb-navigation-element-main').show()
     $('.tb-navigation-element-alt').hide()
 

@@ -136,9 +136,23 @@ Twingl.TreeController = Ember.Controller.extend
         @get("historyMap")[node.id] = node
         delete @get("historyMap")[temporaryId]
 
+        # If the title isn't present, request it from the API
+        if !node.title
+          w = document.createElement("webview")
+          w.src = node.url
+          w.addEventListener "contentload", (evt) =>
+            console.log "contentload", evt
+            w.executeScript code: "document.title", (r) =>
+              document.body.removeChild(w)
+              @get("historyMap")[node.id].title = r[0]
+              Ember.$.ajax "#{window.ENV['api_base']}/nodes/#{node.id}",
+                method: "PUT"
+                data:
+                  node: { title: r[0] }
+          document.body.appendChild(w)
+
       @get("historyStack").push(node)
       @get("historyMap")[node.id] = node
-      console.log @get('historyStack'), @get('historyMap')
 
     ###
     # Rendering the graph
