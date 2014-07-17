@@ -14,12 +14,9 @@ svg {
       stroke:       #3f51b5; // Indigo 500
       stroke-width: 20;
     }
-
-    &:hover {
-      polygon {
-        fill:       #5c6bc0; // Indigo 500
-        stroke:     #5c6bc0; // Indigo 500
-      }
+    &.unread polygon {
+      fill:         #9e9e9e; // Grey 500
+      stroke:       #9e9e9e; // Grey 500
     }
 
     p {
@@ -31,22 +28,15 @@ svg {
       text-align:   center;
     }
 
-    &.unread {
-      p {
-        color:        rgba(0, 0, 0, 0.72);
-      }
+    &.unread p { color: rgba(0, 0, 0, 0.72); }
 
+    &:hover {
       polygon {
-        fill:         #9e9e9e; // Indigo 500
-        stroke:       #9e9e9e; // Indigo 500
+        fill:       #5677fc; // Blue 500
+        stroke:     #5677fc; // Blue 500
       }
 
-      &:hover {
-        polygon {
-          fill:       #5677fc; // Indigo 500
-          stroke:     #5677fc; // Indigo 500
-        }
-      }
+      p { color: rgba(255, 255, 255, 0.96); }
     }
   }
 
