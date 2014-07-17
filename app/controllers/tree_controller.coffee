@@ -222,29 +222,16 @@ Twingl.TreeController = Ember.Controller.extend
     poly = node.append("polygon")
                .attr("stroke-linejoin", "round")
 
-    #label = node.append("g")
-    #            .attr("requiredFeatures", "http://www.w3.org/Graphics/SVG/feature/1.2/#TextFlow")
-    #            .attr("x", (d) -> d.x)
-    #            .attr("y", (d) -> d.y)
-    #            .attr("width", 24)
-    #            .attr("height", 24)
-    #            .append("textArea")
-    #              .text((d) -> d.title)
     label = node.append("foreignObject")
                 .attr("requiredFeatures", "http://www.w3.org/TR/SVG11/feature#Extensibility")
-                #.attr("requiredExtensions", "http://www.w3.org/1999/xhtml")
                 .attr("x", 0)
                 .attr("y", 0)
                 .attr("width",  @get('d3data').nodes.size * 4)
                 .attr("height", @get('d3data').nodes.size * 2.2)
+
     label.append("xhtml:body")
            .append("p")
            .text((d) -> d.title)
-    #label = node.append("text")
-    #            .attr("x", 0)
-    #            .attr("dy", "0.35em")
-    #            .attr("text-anchor", "end")
-    #            .text((d) -> d.title)
 
     # Update the position of the nodes and links
     force.on "tick", ->
