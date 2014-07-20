@@ -21,7 +21,7 @@ OAuth2Authenticator = SimpleAuth.Authenticators.Base.extend
   invalidate: (data) ->
     new Ember.RSVP.Promise (resolve, reject) ->
       body = { token: data['access_token'] }
-      url  = "http://localhost:3000/oauth/revoke"
+      url  = "#{window.ENV['api_host']}/oauth/revoke"
       Ember.$.ajax
         url:         url
         type:        'POST'
