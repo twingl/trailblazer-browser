@@ -6,7 +6,7 @@ window.ENV ||= {}
 window.ENV['default_page'] = "http://google.com"
 window.ENV['search_page'] = "http://google.com"
 
-window.ENV['api_host'] = "http://localhost:3000"
+window.ENV['api_host'] = "https://app.trailblazer.io"
 window.ENV['api_namespace'] = "api/v1"
 
 window.ENV['api_base'] = "#{window.ENV['api_host']}/#{window.ENV['api_namespace']}"

@@ -3,9 +3,9 @@ OAuth2Authenticator = SimpleAuth.Authenticators.Base.extend
 
   authenticate: (credentials) ->
     new Ember.RSVP.Promise (resolve, reject) ->
-      authUrl  = "http://localhost:3000/oauth/authorize"
+      authUrl  = "#{window.ENV['api_host']}/oauth/authorize"
       redirect = encodeURIComponent "https://#{chrome.runtime.id}.chromiumapp.org/"
-      clientId = "3e28871e11e0f4bf55e464bc20cd1774eb8da855a470b5eda766fed6f78943f3"
+      clientId = "f2c3d77a1a31f9149d92c9c02a030787e4c4d3531727f5b6732e379454d246ed"
 
       url = "#{authUrl}?client_id=#{clientId}&response_type=token&redirect_uri=#{redirect}"
 
