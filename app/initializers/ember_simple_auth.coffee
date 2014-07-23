@@ -11,12 +11,17 @@ OAuth2Authenticator = SimpleAuth.Authenticators.Base.extend
 
       chrome.identity.launchWebAuthFlow {'url': url, 'interactive': true}, (redirectUrl) ->
         # Form an object from the redirect URL hash
-        accessToken = redirectUrl.substring(redirectUrl.indexOf("#") + 1)
-        o = {}
-        for item in accessToken.split('&')
+        response = redirectUrl.substring(redirectUrl.indexOf("#") + 1)
+        responseObject = {}
+        for item in response.split('&')
           i = item.split('=')
-          o[i[0]] = i[1]
-        resolve(o)
+          responseObject[i[0]] = i[1]
+
+        if responseObject.access_token
+          resolve(responseObject)
+        else
+          reject(responseObject)
+
 
   invalidate: (data) ->
     new Ember.RSVP.Promise (resolve, reject) ->
