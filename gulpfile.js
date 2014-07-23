@@ -77,7 +77,7 @@ var files = {
   templates   : 'app.hbs.min.js',
   styles      : 'app.min.css',
   scripts     : 'app.min.js',
-  packagedApp : 'twingl-browser',
+  packagedApp : 'trailblazer',
   manifest    : './APP_ROOT/manifest'
 }
 
