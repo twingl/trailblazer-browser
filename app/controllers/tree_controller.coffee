@@ -59,6 +59,8 @@ Twingl.TreeController = Ember.Controller.extend
   #
   # {
   #   id: ID, (assigned a temporary ID before the persisted ID is known)
+  #   parent_id: ID, the parent node
+  #   user_id: ID, assigned by the server
   #   url: String,
   #   title: String,
   #   arrived_at: Date,
