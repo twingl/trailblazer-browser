@@ -28,6 +28,8 @@ Twingl.TreeController = Ember.Controller.extend
   currentNode: ->
     @get("historyMap")[@get("currentNodeId")]
 
+  currentViewCenter: [ 0, 0 ]
+
   d3data:
     nodes:
       size : 25
@@ -165,11 +167,6 @@ Twingl.TreeController = Ember.Controller.extend
 
       if @get("historyStack").length > 0
         @update()
-        svgPanZoom("#tb-history-tree-viz>svg",
-          zoomScaleSensitivity: 0.2
-          minZoom:              0.005
-          maxZoom:              0.2)
-        .zoomAtPoint(0.2, x: 0, y: 0)
 
 
   update: ->
@@ -203,16 +200,32 @@ Twingl.TreeController = Ember.Controller.extend
     force = @get('d3data').force
     svg   = @get('d3data').svg
 
+    container = svg.append("g")
+
+    zoom  = d3.behavior.zoom()
+              .scaleExtent([0.2, 2])
+              .on "zoom", =>
+                @set('currentViewCenter', [
+                  (window.innerWidth/2)  - d3.event.translate[0],
+                  (window.innerHeight/2) - d3.event.translate[1] - 64
+                ])
+                container.transition()
+                         .duration(100)
+                         .ease(d3.ease("cubic-out"))
+                         .attr("transform", "translate(#{d3.event.translate})scale(#{d3.event.scale})")
+
+
+    svg.call(zoom)
     force.nodes(nodes)
          .links(links)
          .start()
 
-    link = svg.selectAll(".link")
+    link = container.selectAll(".link")
               .data(links)
               .enter().append("line")
                       .attr("class", "link")
 
-    node = svg.selectAll('g.node')
+    node = container.selectAll('g.node')
               .data( nodes, (d) -> d.id )
               .enter().append("g")
                       .attr("class", (d) =>
@@ -220,6 +233,38 @@ Twingl.TreeController = Ember.Controller.extend
                         "#{if !d.arrived_at then "unread"} " +
                         "#{if d.id is @get('currentNodeId') then "current"} "
                       )
+
+    pan = (coords) =>
+      # 64 is a magic number - same height as the browser chrome.
+      if coords then @set('currentViewCenter', [
+        (window.innerWidth/2)  - coords[0],
+        (window.innerHeight/2) - coords[1] - 64
+      ])
+      zoom.translate([
+        (window.innerWidth/2)  - @get('currentViewCenter')[0],
+        (window.innerHeight/2) - @get('currentViewCenter')[1] - 64
+      ])
+      container.transition()
+               .duration(300)
+               .ease(d3.ease("cubic-out"))
+               .attr("transform", "translate(#{[
+                 (window.innerWidth/2)  - @get('currentViewCenter')[0],
+                 (window.innerHeight/2) - @get('currentViewCenter')[1] - 64
+               ]})scale(#{zoom.scale()})")
+
+    pan()
+    window.onresize = _.debounce ( => pan() ), 20
+
+    #Centering on the current node
+    #for n in nodes
+    #  if n.id is @get('currentNodeId')
+    #    window.setTimeout ( =>
+    #      container.attr("transform", "translate(#{[
+    #        (window.innerWidth/2) - n.x,
+    #        (window.innerHeight/2) - n.y - 64
+    #      ]})scale(1)")
+    #    ), 2000
+
 
     node.on "click", (d) =>
       @updateCurrentNode(d)
@@ -240,7 +285,7 @@ Twingl.TreeController = Ember.Controller.extend
            .text((d) -> d.title)
 
     # Update the position of the nodes and links
-    force.on "tick", ->
+    force.on "tick", =>
       link.attr("x1", (d) -> d.source.x)
           .attr("y1", (d) -> d.source.y)
           .attr("x2", (d) -> d.target.x)
