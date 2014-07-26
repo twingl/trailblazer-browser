@@ -301,3 +301,7 @@ Twingl.TreeController = Ember.Controller.extend
 
       label.attr("x", (d) -> d.x-d.offsets.x)
            .attr("y", (d) -> d.y-d.offsets.y.minor)
+
+    force.on "end", =>
+      console.log "Force Ended"
+      console.log _.collect nodes, (n) => [n.x, n.y]
