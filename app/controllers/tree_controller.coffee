@@ -29,6 +29,7 @@ Twingl.TreeController = Ember.Controller.extend
     @get("historyMap")[@get("currentNodeId")]
 
   currentViewCenter: [ 0, 0 ]
+  currentViewScale: 1
 
   d3data:
     nodes:
@@ -209,6 +210,7 @@ Twingl.TreeController = Ember.Controller.extend
                   (window.innerWidth/2)  - d3.event.translate[0],
                   (window.innerHeight/2) - d3.event.translate[1] - 64
                 ])
+                @set('currentViewScale', d3.event.scale)
                 container.transition()
                          .duration(100)
                          .ease(d3.ease("cubic-out"))
@@ -234,26 +236,23 @@ Twingl.TreeController = Ember.Controller.extend
                         "#{if d.id is @get('currentNodeId') then "current"} "
                       )
 
-    pan = (coords) =>
+    pan = (duration = 300) =>
       # 64 is a magic number - same height as the browser chrome.
-      if coords then @set('currentViewCenter', [
-        (window.innerWidth/2)  - coords[0],
-        (window.innerHeight/2) - coords[1] - 64
-      ])
       zoom.translate([
         (window.innerWidth/2)  - @get('currentViewCenter')[0],
         (window.innerHeight/2) - @get('currentViewCenter')[1] - 64
       ])
+      zoom.scale(@get('currentViewScale'))
       container.transition()
-               .duration(300)
+               .duration(duration)
                .ease(d3.ease("cubic-out"))
                .attr("transform", "translate(#{[
                  (window.innerWidth/2)  - @get('currentViewCenter')[0],
                  (window.innerHeight/2) - @get('currentViewCenter')[1] - 64
-               ]})scale(#{zoom.scale()})")
+               ]})scale(#{@get('currentViewScale')})")
 
-    pan()
-    window.onresize = _.debounce ( => pan() ), 20
+    pan(0)
+    window.onresize = _.debounce ( => pan(0) ), 20
 
     #Centering on the current node
     #for n in nodes
