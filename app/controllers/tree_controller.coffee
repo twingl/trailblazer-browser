@@ -23,13 +23,15 @@ Twingl.TreeController = Ember.Controller.extend
     @set "currentNodeId", undefined
     @set "historyStack",  []
     @set "historyMap",    {}
+    @set "currentViewCenter", [ 0, 0 ]
+    @set "currentViewScale", 0.2
 
   currentNodeId: undefined
   currentNode: ->
     @get("historyMap")[@get("currentNodeId")]
 
   currentViewCenter: [ 0, 0 ]
-  currentViewScale: 1
+  currentViewScale: 0.2
 
   d3data:
     nodes:
@@ -41,7 +43,7 @@ Twingl.TreeController = Ember.Controller.extend
                        .chargeDistance 1600
                        .linkDistance 200
                        .linkStrength 1
-                       .friction 0.95
+                       .friction 0.8
                        .gravity 0
 
   updateCurrentNode: (node) ->
@@ -124,6 +126,8 @@ Twingl.TreeController = Ember.Controller.extend
 
       @get("historyStack").push(node)
       @get("historyMap")[node.id] = node
+      @get("historyMap")[node.id].x = @get("historyMap")[@get("currentNodeId")].x
+      @get("historyMap")[node.id].y = @get("historyMap")[@get("currentNodeId")].y
       console.log @get('historyStack'), @get('historyMap')
 
     queueUnread: (node) ->
@@ -184,6 +188,8 @@ Twingl.TreeController = Ember.Controller.extend
     # Generate lists of nodes, links and a mapping from ID to list index
     for id, node of history
       idMap[node.id] = index++
+      node.x = 50 unless node.x
+      node.y = 50 unless node.y
       node.offsets =
         x: @get('d3data').nodes.size * 2
         y:
@@ -302,5 +308,12 @@ Twingl.TreeController = Ember.Controller.extend
            .attr("y", (d) -> d.y-d.offsets.y.minor)
 
     force.on "end", =>
-      console.log "Force Ended"
-      console.log _.collect nodes, (n) => [n.x, n.y]
+      o = {}
+      _.each nodes, (n) =>
+        @get('historyMap')[n.id].x = n.x
+        @get('historyMap')[n.id].y = n.y
+        o[n.id] = { x: n.x, y: n.y }
+      Ember.$.ajax "#{window.ENV['api_base']}/assignments/#{@get('assignment').id}/nodes/coords",
+        method: "PUT"
+        contentType: "application/json"
+        data: JSON.stringify({ nodes: o })
