@@ -3,7 +3,7 @@
   "name": "Trailblazer",
   "short_name": "Trailblazer",
   "description": "Trailblazer is a web browser that turns the research process for a student into a browsable map.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "minimum_chrome_version": "29",
   "permissions": [
     "webview",
