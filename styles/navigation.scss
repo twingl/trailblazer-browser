@@ -16,22 +16,61 @@
 /*----------------------------------*\
  *  Window Controls
 \*----------------------------------*/
+
+// Positioning.
 #tb-navigation-window {
   ul {
     display: inline-block;
-    &, li {
-      border : 0;
-      padding: 0;
-      margin : 0;
-    }
-
+    margin-top: 10px;
+    margin-right: 10px;
     li {
-      display        : inline;
+      display: inline-block;
       list-style-type: none;
-      height         : 24px;
+      border: 0;
+      padding: 0;
+      margin: 0 8px 0 0;
     }
+    &:last-child {margin-right: 3px;}
+  }
+}
+
+// Window control styling. 
+.tb-window-control {
+  -webkit-app-region: no-drag;
+  width         : 36px;
+  height        : 36px;
+  line-height   : 40px;
+  text-align    : center;
+  border-radius : 2px;
+
+  color         : rgba(0, 0, 0, 0.57);
+  background    : rgba(255, 255, 255, 0.3);
+  cursor        : pointer;
+
+  border-radius : 2px;
+  background    : #F6F5F3;
+
+  &:hover {
+    background  : rgba(255, 255, 255, 0.5);
+    color       : rgba(0, 0, 0, 0.7);
   }
 
+  // Manual tweaking of the icon alignment #pixelpushing
+  &.fa:before {
+    position: relative;
+    top     : -1px;
+  }
+
+  &.fa.fa-minus:before { font-size: 15px; }
+  &.fa.fa-plus:before  { font-size: 15px; } 
+  &.fa.fa-times:before { font-size: 16px; }
+}
+
+
+
+
+// Legacy styles
+#tb-navigation-window {
   .tb-window-nav {
     -webkit-app-region: no-drag;
     height        : 24px;
@@ -51,35 +90,6 @@
         color     : rgba(0, 0, 0, 0.7);
       }
     }
-  }
-
-  .tb-window-control {
-    -webkit-app-region: no-drag;
-    width         : 30px;
-    height        : 24px;
-    padding-left  : 4px;
-    padding-right : 4px;
-
-    line-height   : 26px;
-    text-align    : center;
-    vertical-align: top;
-
-    color       : rgba(0, 0, 0, 0.57);
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.2);
-      color     : rgba(0, 0, 0, 0.7);
-    }
-
-    // Manual tweaking of the icon alignment #pixelpushing
-    &.fa:before {
-      position: relative;
-      top     : -1px;
-    }
-
-    &.fa.fa-minus:before { font-size: 15px; }
-    &.fa.fa-plus:before  { font-size: 15px; } 
-    &.fa.fa-times:before { font-size: 16px; }
   }
 }
 

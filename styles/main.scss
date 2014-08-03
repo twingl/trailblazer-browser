@@ -24,19 +24,21 @@ html, body, body>div {
   }
 
   #tb-navigation-window {
-    background: rgba(0, 0, 0, 0.2);
-    height: 24px;
+    height: 56px;
+    z-index: 2;
+    position: absolute;
   }
 
   #tb-navigation-main {
     background: rgba(0, 0, 0, 0.1);
     height: 40px;
+    display: none; // Disabling this while I work on login/project screens.
   }
 
   #tb-pane-main,
   #tb-pane-alt {
     position: absolute;
-    top     : 64px;
+    top     : 0;
     bottom  : 0;
     left    : 0;
     right   : 0;
@@ -45,7 +47,7 @@ html, body, body>div {
   }
 
   #tb-pane-main {
-    z-index : 1;
+    z-index : 0;
   }
 
   #tb-pane-alt {
