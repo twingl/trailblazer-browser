@@ -27,4 +27,9 @@
   &:hover {
     opacity: 1;
   }
+  &:focus, &:active {
+    border:none;
+    outline: 0;
+    background-image: url(/images/login-gem-active.png);
+  }
 }
