@@ -42,11 +42,3 @@ Twingl.NavigationController = Ember.Controller.extend
       $('.tb-navigation-element-main').hide()
       $('.tb-navigation-element-alt').show 0, =>
         @get('tree').send('drawTree')
-
-
-    # Hides the trail view and shows the browser
-    browserShow: ->
-      $('#tb-pane-alt').hide()
-      $('#tb-pane-main').removeClass('blur')
-      $('.tb-navigation-element-main').show()
-      $('.tb-navigation-element-alt').hide()

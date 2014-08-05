@@ -1,10 +1,7 @@
 <div id="tb-ui-primary">
   <div id="tb-navigation-window">
-    <div>
-      {{outlet windowNavigation}}
-    </div>
 
-    <div class="flex"></div>
+    <div class="flex"><p>Title of the page</p></div>
 
     <div>
       <ul class="actions">
@@ -16,5 +13,11 @@
   </div>
   <div id="tb-navigation-main">{{outlet navigation}}</div>
   <div id="tb-pane-main">{{outlet}}</div>
-  <div id="tb-pane-alt">{{outlet alt}}</div>
+  <div id="tb-pane-alt">
+    <div class="assignment-switcher">
+      <nav><ul><li class="tb-navigation-element-alt">{{view Twingl.BrowserShowButton}}</li></ul></nav>
+      {{outlet windowNavigation}}
+    </div>
+    {{outlet alt}}
+  </div>
 </div>
