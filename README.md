@@ -55,7 +55,7 @@ app from the `APP_ROOT` directory
 
     gulp [TASK]
 
-Task can be:
+where `TASK` is one of the following:
 
 * `autobuild`: Watches the `/templates`, `/styles` and `/scripts` directories.
 When changes are detected it will compile and assemble the app, ready for
