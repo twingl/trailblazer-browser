@@ -50,3 +50,32 @@ for deployment to the Chrome web store.
 Once the app is built (current revisions should be checked in, but build prior
 to loading to ensure their versions are consistent), you can load the unpacked
 app from the `APP_ROOT` directory
+
+## Gulp Tasks
+
+    gulp [TASK]
+
+Task can be:
+
+* `autobuild`: Watches the `/templates`, `/styles` and `/scripts` directories.
+When changes are detected it will compile and assemble the app, ready for
+loading into Chrome.
+
+* `watch`: Watches the `/templates` and `/scripts` directories. When changes are
+detected, it will initiate the spec runner task, `gulp spec`
+
+* `spec`: Runs the tests/specs for the application. Not yet implemented.
+
+* `assemble`: Takes the source files in `/templates`, `/styles`, `/scripts` and
+runs them through their compilers (Handlebars, SASS, CoffeeScript
+respectively). The compiled output is concatenated (and minified in the case
+of JS), and output into an intermediate directory outside of `APP_ROOT`. The
+compiled and minified source from the intermediate directory is then copied
+into the appropriate directory in `/APP_ROOT`
+
+* `release`: Performs a clean compilation of the application, resulting in a
+package ready to deploy to the Chrome web store. The output archive is
+tagged with the version, read from the manifest, of the form:
+`<name>-<version>.zip`.  Note that `<name>` is not read from the manifest, but
+declared in gulpfile.js
+
