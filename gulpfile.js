@@ -182,7 +182,7 @@ gulp.task('styles', function () {
 gulp.task('scripts', function () {
   return gulp.src(locations.src.scripts)
       .pipe(coffee())
-      //.pipe(uglify())
+      .pipe(uglify())
       .pipe(concat(files.scripts))
       .pipe(gulp.dest(locations.build.scripts));
 });
