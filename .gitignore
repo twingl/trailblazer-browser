@@ -3,3 +3,7 @@
 node_modules/
 release/
 tmp/
+
+APP_ROOT/styles/app.min.css
+APP_ROOT/templates/app.hbs.min.js
+APP_ROOT/scripts/app.min.js
