@@ -30,21 +30,13 @@ gulp.task('default', ['watch']);
 
 
 /**
- * Assemble the app when the source is modified
- */
-gulp.task('autobuild', function () {
-  gulp.watch(locations.src.templates, ['assemble']);
-  gulp.watch(locations.src.styles,    ['assemble']);
-  gulp.watch(locations.src.scripts,   ['assemble']);
-});
-
-
-/**
  * Automatically run specs when scripts are changed
  */
 gulp.task('watch', function () {
-  gulp.watch(locations.src.templates, ['spec']);
-  gulp.watch(locations.src.scripts,   ['spec']);
+  gulp.watch(locations.src.specs,     ['assemble']);
+  gulp.watch(locations.src.templates, ['assemble']);
+  gulp.watch(locations.src.styles,    ['assemble']);
+  gulp.watch(locations.src.scripts,   ['assemble']);
 });
 
 
@@ -74,6 +66,7 @@ gulp.task('release', ['compile', 'copy', 'assemble'], function () {
 
 
 var files = {
+  specs       : 'suite.js',
   templates   : 'app.hbs.min.js',
   styles      : 'app.min.css',
   scripts     : 'app.min.js',
@@ -84,6 +77,7 @@ var files = {
 var locations = {
   // Development source - the ones you should be editing
   src: {
+    specs     : [ 'specs/**/*.coffee' ],
     templates : [ 'templates/**/*.hbs' ],
     styles    : [ 'styles/**/*.scss' ],
     scripts   : [
@@ -100,6 +94,7 @@ var locations = {
 
   // Intermediate location for compiled source
   build: {
+    specs     : 'tmp/specs',
     templates : 'tmp/templates',
     styles    : 'tmp/styles',
     scripts   : 'tmp/scripts'
@@ -112,12 +107,24 @@ var locations = {
     scripts   : 'APP_ROOT/scripts'
   },
 
+  // Location of the source in the Chrome app source tree
+  test: {
+    specs     : 'TEST_ROOT/specs',
+    templates : 'TEST_ROOT/templates',
+    styles    : 'TEST_ROOT/styles',
+    scripts   : 'TEST_ROOT/scripts'
+  },
+
   pkgTarget: 'APP_ROOT/**/*',
   releaseDir: 'release'
 };
 
 var toClean = [
                 'tmp/*',
+                locations.test.specs + '/' + files.specs,
+                locations.test.templates + '/' + files.templates,
+                locations.test.styles + '/' + files.styles,
+                locations.test.scripts + '/' + files.scripts,
                 locations.release.templates + '/' + files.templates,
                 locations.release.styles + '/' + files.styles,
                 locations.release.scripts + '/' + files.scripts
@@ -127,14 +134,6 @@ var toClean = [
 /*------------------*\
  * Supporting Tasks *
 \*------------------*/
-
-/**
- * Run the specs for the project
- */
-gulp.task('spec', function () {
-  return util.log(util.colors.yellow("Spec not yet implemented"));
-});
-
 
 /**
  * Cleans up remnants from the previous compilation
@@ -188,10 +187,23 @@ gulp.task('scripts', function () {
 
 
 /**
+ * Compile, uglify, and concatenate the scripts used in the project, ready for
+ * inclusion in the packaged app
+ */
+gulp.task('specs', function () {
+  return gulp.src(locations.src.specs)
+      .pipe(coffee())
+      .pipe(concat(files.specs))
+      .pipe(gulp.dest(locations.build.specs));
+});
+
+
+/**
  * Copy the compiled sources into their intended location in the app
  */
-gulp.task('copy', ['templates','styles','scripts'], function () {
+gulp.task('copy', ['templates','styles','scripts', 'specs'], function () {
   return es.merge(
+    // Copy to Application package location
     gulp.src(locations.build.styles + '/' + files.styles)
         .pipe(gulp.dest(locations.release.styles)),
 
@@ -199,7 +211,20 @@ gulp.task('copy', ['templates','styles','scripts'], function () {
         .pipe(gulp.dest(locations.release.scripts)),
 
     gulp.src(locations.build.templates + '/' + files.templates)
-        .pipe(gulp.dest(locations.release.templates)));
+        .pipe(gulp.dest(locations.release.templates)),
+
+    // Copy to testing package location
+    gulp.src(locations.build.specs + '/' + files.specs)
+        .pipe(gulp.dest(locations.test.specs)),
+
+    gulp.src(locations.build.styles + '/' + files.styles)
+        .pipe(gulp.dest(locations.test.styles)),
+
+    gulp.src(locations.build.scripts + '/' + files.scripts)
+        .pipe(gulp.dest(locations.test.scripts)),
+
+    gulp.src(locations.build.templates + '/' + files.templates)
+        .pipe(gulp.dest(locations.test.templates)));
 });
 
 

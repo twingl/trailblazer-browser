@@ -27,18 +27,11 @@ After installing the dev dependencies...
 
 ...you can:
 
-**run the default task** which watches the source directory, then runs the specs
-whenever part of the functional source changes
+**run the default task (watch)** which watches the source directory, compiling
+and assembling the app as changes are made to the source or spec files that
+require compilation
 
     $ gulp
-
-(specs are yet to be included)
-
-**run the autobuild task** which watches the source directory, compiling and
-assembling the app as changes are made to the source files that require
-compilation
-
-    $ gulp autobuild
 
 or **run the release task** which compiles, assembles, and packages the app ready
 for deployment to the Chrome web store.
@@ -50,6 +43,10 @@ for deployment to the Chrome web store.
 Once the app is built (current revisions should be checked in, but build prior
 to loading to ensure their versions are consistent), you can load the unpacked
 app from the `APP_ROOT` directory
+
+If you are making changes to the browser itself, load the test harness as well.
+It is the same process as loading the unpacked app, just point at `TEST_ROOT`
+instead of `APP_ROOT`
 
 ## Gulp Tasks
 
