@@ -18,8 +18,6 @@ window.ENV['simple-auth'] =
 
 
 window.Twingl = Ember.Application.create
-  rootElement: "#app"
-
   ready: ->
     document.title = "Twingl Browser"
 
