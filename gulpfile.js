@@ -94,8 +94,7 @@ var locations = {
       'app/controllers/**/*.coffee',
       'app/views/**/*.coffee',
       'app/routes/**/*.coffee',
-      'app/router.coffee',
-      'app/main.coffee'
+      'app/router.coffee'
     ]
   },
 
