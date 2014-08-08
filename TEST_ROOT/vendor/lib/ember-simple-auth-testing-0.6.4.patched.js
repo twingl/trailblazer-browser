@@ -132,9 +132,8 @@ define('simple-auth/configuration',  ['exports'], function(__exports__) {
 });
 
 
-requireModule('simple-auth-testing/ember');
-
 if (global.Ember.testing) {
+  requireModule('simple-auth-testing/ember');
   requireModule('simple-auth-testing/test-helpers');
 }
 })((typeof global !== 'undefined') ? global : window);
