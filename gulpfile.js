@@ -13,7 +13,6 @@ var gulp    = require('gulp')
   , cssmin        = require('gulp-cssmin')
   , declare       = require('gulp-declare')
   , defineModule  = require('gulp-define-module')
-  , uglify        = require('gulp-uglify')
   , util          = require('gulp-util')
   , watch         = require('gulp-watch')
   , zip           = require('gulp-zip');
@@ -154,7 +153,6 @@ gulp.task('clean', function () {
 gulp.task('templates', function () {
   return gulp.src(locations.src.templates)
       .pipe(handlebars({ outputType: 'browser'}))
-      .pipe(uglify())
       .pipe(concat(files.templates))
       .pipe(gulp.dest(locations.build.templates))
 });
@@ -174,20 +172,19 @@ gulp.task('styles', function () {
 
 
 /**
- * Compile, uglify, and concatenate the scripts used in the project, ready for
+ * Compile, and concatenate the scripts used in the project, ready for
  * inclusion in the packaged app
  */
 gulp.task('scripts', function () {
   return gulp.src(locations.src.scripts)
       .pipe(coffee())
-      .pipe(uglify())
       .pipe(concat(files.scripts))
       .pipe(gulp.dest(locations.build.scripts));
 });
 
 
 /**
- * Compile, uglify, and concatenate the scripts used in the project, ready for
+ * Compile, and concatenate the scripts used in the project, ready for
  * inclusion in the packaged app
  */
 gulp.task('specs', function () {
