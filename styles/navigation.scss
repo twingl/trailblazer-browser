@@ -1,41 +1,40 @@
 /* Set up reusable flex rules for nav bars */
-#tb-navigation-window,
-#tb-navigation-main nav {
-  display: -webkit-flex;
-  display:         flex;
 
-  -webkit-flex-direction: row;
-          flex-direction: row;
-
-  .flex {
-    -webkit-flex: 1 1 auto;
-            flex: 1 1 auto;
-  }
+#tb-browser-chrome {
+  -webkit-app-region: drag;
+  height: 56px;
+  background: transparent;
+  z-index: 20;
+  display: flex;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  justify-content: space-between;
 }
 
 /*----------------------------------*\
  *  Window Controls
 \*----------------------------------*/
 
-// Positioning.
-#tb-navigation-window {
-  ul {
-    display: inline-block;
-    margin-top: 10px;
-    margin-right: 10px;
-    li {
-      display: inline-block;
-      list-style-type: none;
-      border: 0;
-      padding: 0;
-      margin: 0 8px 0 0;
+.actions {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding:0;
+  li {
+    display: inline-block!important;
+    list-style-type: none;
+    border: 0;
+    padding: 0;
+    margin: 0 8px 0 0;
+    &[style="display: none;"] {
+      display: none!important;
     }
-    &:last-child {margin-right: 3px;}
   }
 }
 
 // Window control styling. 
-.tb-window-control {
+.tb-chrome-button {
   -webkit-app-region: no-drag;
   width         : 36px;
   height        : 36px;
@@ -96,41 +95,17 @@
  *  Browsing Controls
 \*----------------------------------*/
 
-#tb-navigation-main {
-  nav {
-    position: absolute;
-    width   : 100%;
+.tb-browser-nav {
+  
+}
 
-    &.loading { background: red; }
-
-    .tb-navigation-element-alt {
-      display: none;
-    }
-
-    ul {
-      display: inline-block;
-
-      &, li {
-        border : 0;
-        padding: 0;
-        margin : 0;
-      }
-
-      li {
-        display        : inline;
-        list-style-type: none;
-      }
-    }
-  }
-
-  .tb-nav-button {
+.tb-nav-button {
     -webkit-app-region: no-drag;
-    width         : 24px;
-    height        : 24px;
-
+    width: 100%;
+    height: 100%;
     font-size     : 24px;
+    line-height: 36px;
 
-    padding       : 8px;
     text-align    : center;
     vertical-align: top;
     cursor        : pointer;
@@ -142,4 +117,4 @@
       color     : rgba(0, 0, 0, 0.7);
     }
   }
-}
+

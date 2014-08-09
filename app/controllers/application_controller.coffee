@@ -29,10 +29,3 @@ Twingl.ApplicationController = Ember.Controller.extend
 
     closeWindow: ->
       chrome.app.window.current().close()
-
-    # Hides the trail view and shows the browser
-    browserShow: ->
-      $('#tb-pane-alt').hide()
-      $('#tb-pane-main').removeClass('blur')
-      $('.tb-navigation-element-main').show()
-      $('.tb-navigation-element-alt').hide()

@@ -17,26 +17,6 @@ html, body, body>div {
   height  : 100%;
   background: #fafafa; // Some window decorators don't drop shadows behind windows
 
-  #tb-navigation-window,
-  #tb-navigation-main {
-    -webkit-app-region: drag;
-    width : 100%;
-  }
-
-  #tb-navigation-window {
-    height: 56px;
-    z-index: 10;
-    position: absolute;
-  }
-
-  #tb-navigation-main {
-    background: rgba(0, 0, 0, 0.1);
-    height: 40px;
-    z-index: 15;
-    top: 56px;
-    // display: none; // Disabling this while I work on login/project screens.
-  }
-
   #tb-pane-main,
   #tb-pane-alt {
     position: absolute;
