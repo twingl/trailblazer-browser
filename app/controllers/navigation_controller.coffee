@@ -1,8 +1,10 @@
 Twingl.NavigationController = Ember.Controller.extend
 
-  needs: ['webview', 'tree']
+  needs: ['webview', 'tree', 'application']
   webview:  Ember.computed.alias "controllers.webview"
   tree:     Ember.computed.alias "controllers.tree"
+
+  loading: Ember.computed.alias "controllers.application.loading"
 
   resetState: ->
     @set 'loading', false
@@ -15,8 +17,6 @@ Twingl.NavigationController = Ember.Controller.extend
   # This is bound to a read-only view, but may be used for URL input if
   # @navigateUrl is called after setting
   url: ''
-
-  loading: false
 
   actions:
     ###
@@ -34,6 +34,11 @@ Twingl.NavigationController = Ember.Controller.extend
     navigateReload: ->
       @get('webview').reload()
 
+    navigateHistoryBack: ->
+      if parent = @get('tree').parentNode()
+        @get('tree').updateCurrentNode(parent)
+        @get('webview').navigate parent.url, false
+
     # Hides the browser and shows the trail view
     historyShow: ->
       @set 'loading', false
@@ -43,10 +48,10 @@ Twingl.NavigationController = Ember.Controller.extend
       $('.tb-navigation-element-alt').show 0, =>
         @get('tree').send('drawTree')
 
-
     # Hides the trail view and shows the browser
     browserShow: ->
       $('#tb-pane-alt').hide()
       $('#tb-pane-main').removeClass('blur')
       $('.tb-navigation-element-main').show()
       $('.tb-navigation-element-alt').hide()
+

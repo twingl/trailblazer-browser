@@ -1,12 +1,9 @@
 <div id="tb-ui-primary">
-  <div id="tb-navigation-window">
-    <div>
-      {{outlet windowNavigation}}
-    </div>
+  <div id="tb-browser-chrome">
 
-    <div class="flex"></div>
-
-    <div>
+    <div id="tb-navigation-browser">{{outlet navigation}}</div>
+    <span class="flex"></span>
+    <div id="tb-navigation-window">
       <ul class="actions">
         <li>{{view Twingl.WindowMinimizeButton}}</li>
         <li>{{view Twingl.WindowMaximizeButton}}</li>
@@ -14,7 +11,12 @@
       </ul>
     </div>
   </div>
-  <div id="tb-navigation-main">{{outlet navigation}}</div>
-  <div id="tb-pane-main">{{outlet}}</div>
-  <div id="tb-pane-alt">{{outlet alt}}</div>
+
+  <div id="tb-pane-main" {{bind-attr class="loading"}}>{{outlet}}</div>
+  <div id="tb-pane-alt">
+    <div class="assignment-switcher">
+      {{outlet windowNavigation}}
+    </div>
+    {{outlet alt}}
+  </div>
 </div>

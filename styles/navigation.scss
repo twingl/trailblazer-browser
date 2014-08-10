@@ -1,127 +1,131 @@
 /* Set up reusable flex rules for nav bars */
-#tb-navigation-window,
-#tb-navigation-main nav {
-  display: -webkit-flex;
-  display:         flex;
 
-  -webkit-flex-direction: row;
-          flex-direction: row;
-
-  .flex {
-    -webkit-flex: 1 1 auto;
-            flex: 1 1 auto;
-  }
+#tb-browser-chrome {
+  -webkit-app-region: drag;
+  height: 56px;
+  background: transparent;
+  z-index: 20;
+  display: flex;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  justify-content: space-between;
 }
 
 /*----------------------------------*\
  *  Window Controls
 \*----------------------------------*/
-#tb-navigation-window {
-  ul {
-    display: inline-block;
-    &, li {
-      border : 0;
-      padding: 0;
-      margin : 0;
+
+.actions {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding:0;
+  margin-left: 10px;
+  li {
+    display: inline-block!important;
+    list-style-type: none;
+    border: 0;
+    padding: 0;
+    margin: 0 8px 0 0;
+    width: 36px;
+    height: 36px;
+    &[style="display: none;"] {
+      display: none!important;
     }
-
-    li {
-      display        : inline;
-      list-style-type: none;
-      height         : 24px;
-    }
-  }
-
-  .tb-window-nav {
-    -webkit-app-region: no-drag;
-    height        : 24px;
-    line-height   : 24px;
-
-    &.tb-assignment-switch {
-      font-family : "RobotoDraft";
-      font-size   : 13px;
-      cursor      : pointer;
-      border      : 0;
-
-      color       : rgba(0, 0, 0, 0.57);
-      background  : none;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.2);
-        color     : rgba(0, 0, 0, 0.7);
-      }
-    }
-  }
-
-  .tb-window-control {
-    -webkit-app-region: no-drag;
-    width         : 30px;
-    height        : 24px;
-    padding-left  : 4px;
-    padding-right : 4px;
-
-    line-height   : 26px;
-    text-align    : center;
-    vertical-align: top;
-
-    color       : rgba(0, 0, 0, 0.57);
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.2);
-      color     : rgba(0, 0, 0, 0.7);
-    }
-
-    // Manual tweaking of the icon alignment #pixelpushing
-    &.fa:before {
-      position: relative;
-      top     : -1px;
-    }
-
-    &.fa.fa-minus:before { font-size: 15px; }
-    &.fa.fa-plus:before  { font-size: 15px; } 
-    &.fa.fa-times:before { font-size: 16px; }
   }
 }
 
+// Window control styling. 
+.tb-chrome-button {
+  -webkit-app-region: no-drag;
+  width         : 36px;
+  height        : 36px;
+  line-height   : 40px;
+  text-align    : center;
+  border-radius : 2px;
+
+  color         : rgba(0, 0, 0, 0.57);
+  background    : rgba(255, 255, 255, 0.3);
+  cursor        : pointer;
+
+  border-radius : 2px;
+
+  &:hover {
+    background  : rgba(255, 255, 255, 0.5);
+    color       : rgba(0, 0, 0, 0.7);
+  }
+
+  // Manual tweaking of the icon alignment #pixelpushing
+  &.fa:before {
+    position: relative;
+    top     : -1px;
+  }
+
+  &.fa.fa-minus:before { font-size: 15px; }
+  &.fa.fa-plus:before  { font-size: 15px; } 
+  &.fa.fa-times:before { font-size: 16px; }
+}
+
+
+.assignment-switcher {
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  top: 56px;
+  
+}
+
+.tb-assignment-switch {
+
+      font-family : "RobotoDraft";
+      font-size   : 24px;
+      cursor      : pointer;
+      border      : 0;
+      padding: 12px;
+
+      color       : #fff;
+      background: linear-gradient(to bottom, #00b7ea 0%,#009ec3 100%); /* W3C */
+      border-radius: 4px;
+
+      &:hover {
+        background: linear-gradient(to bottom, #009eca 0%,#0089a8 100%); /* W3C */
+      }
+
+      &:after {
+        content: "Switch Assignment";
+        display: block;
+        position: absolute;
+        text-align: center;
+        font-size: 0.5em;
+        bottom: -1.5em;
+        left: 0;
+        width: 100%;
+        color: #444;
+      }
+    }
+
+#tb-show-history,
+#tb-show-browser {
+  position: absolute;
+  left: 50%;
+  margin-left: -18px;
+}
 /*----------------------------------*\
  *  Browsing Controls
 \*----------------------------------*/
 
-#tb-navigation-main {
-  nav {
-    position: absolute;
-    width   : 100%;
+.tb-browser-nav {
+  
+}
 
-    &.loading { background: red; }
-
-    .tb-navigation-element-alt {
-      display: none;
-    }
-
-    ul {
-      display: inline-block;
-
-      &, li {
-        border : 0;
-        padding: 0;
-        margin : 0;
-      }
-
-      li {
-        display        : inline;
-        list-style-type: none;
-      }
-    }
-  }
-
-  .tb-nav-button {
+.tb-nav-button {
     -webkit-app-region: no-drag;
-    width         : 24px;
-    height        : 24px;
-
+    width: 100%;
+    height: 100%;
     font-size     : 24px;
+    line-height: 36px;
 
-    padding       : 8px;
     text-align    : center;
     vertical-align: top;
     cursor        : pointer;
@@ -133,4 +137,4 @@
       color     : rgba(0, 0, 0, 0.7);
     }
   }
-}
+

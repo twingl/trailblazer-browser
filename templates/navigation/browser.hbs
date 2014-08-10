@@ -1,14 +1,12 @@
-<nav {{bind-attr class="loading"}}>
-  <ul>
-    <li class="tb-navigation-element-main">{{view Twingl.HistoryShowButton}}</li>
-    <li class="tb-navigation-element-main">{{view Twingl.SearchButton}}</li>
-
-    <li class="tb-navigation-element-alt">{{view Twingl.BrowserShowButton}}</li>
+<!-- Browser Navigation Module. This is where we place the nav gem. --> 
+<!-- This module is also where the "close Trail" button is located. These buttons are shown and hidden
+dynamically. -->
+<nav id="tb-browser-nav" {{bind-attr class="loading"}}>
+  <ul class="actions">
+    <!--<li class="tb-chrome-button  tb-navigation-element-main">{{view Twingl.BrowserBackButton}}</li>-->
+    <li id="tb-show-history" class="tb-chrome-button  tb-navigation-element-main">{{view Twingl.HistoryShowButton}}</li>
+    <li class="tb-chrome-button  tb-navigation-element-main">{{view Twingl.SearchButton}}</li>
+    <li id="tb-show-browser" class="tb-chrome-button  tb-navigation-element-alt">{{view Twingl.BrowserShowButton}}</li>
   </ul>
 
-  <span class="flex"></span>
-
-  <ul>
-    <li class="tb-navigation-element-main">{{view Twingl.LogoutButton}}</li>
-  </ul>
 </nav>

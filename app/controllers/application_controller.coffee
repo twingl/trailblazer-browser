@@ -2,6 +2,8 @@ Twingl.ApplicationController = Ember.Controller.extend
   needs: ['tree', 'webview', 'navigation']
   assignment: undefined
 
+  loading: false
+
   actions:
 
     # Navigate back to the assignments view
