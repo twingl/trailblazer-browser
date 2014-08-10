@@ -105,6 +105,7 @@ Twingl.TreeController = Ember.Controller.extend
           @get('webview').navigate @currentNode().url, false
         else
           # we have an empty project - send us to the home page
+          setTimeout ( => @get('navigation').send('browserShow')), 40
           @get('webview').navigate(window.ENV['default_page'])
         console.log @get('historyStack'), @get('historyMap')
         cb()
