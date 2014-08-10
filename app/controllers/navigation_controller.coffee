@@ -34,6 +34,11 @@ Twingl.NavigationController = Ember.Controller.extend
     navigateReload: ->
       @get('webview').reload()
 
+    navigateHistoryBack: ->
+      if parent = @get('tree').parentNode()
+        @get('tree').updateCurrentNode(parent)
+        @get('webview').navigate parent.url, false
+
     # Hides the browser and shows the trail view
     historyShow: ->
       @set 'loading', false

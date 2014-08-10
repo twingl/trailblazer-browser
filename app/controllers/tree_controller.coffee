@@ -30,6 +30,9 @@ Twingl.TreeController = Ember.Controller.extend
   currentNode: ->
     @get("historyMap")[@get("currentNodeId")]
 
+  parentNode: ->
+    @get("historyMap")[@currentNode().parent_id]
+
   currentViewCenter: [ 0, 0 ]
   currentViewScale: 0.2
 
