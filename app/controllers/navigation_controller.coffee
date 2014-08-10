@@ -1,8 +1,10 @@
 Twingl.NavigationController = Ember.Controller.extend
 
-  needs: ['webview', 'tree']
+  needs: ['webview', 'tree', 'application']
   webview:  Ember.computed.alias "controllers.webview"
   tree:     Ember.computed.alias "controllers.tree"
+
+  loading: Ember.computed.alias "controllers.application.loading"
 
   resetState: ->
     @set 'loading', false
@@ -15,8 +17,6 @@ Twingl.NavigationController = Ember.Controller.extend
   # This is bound to a read-only view, but may be used for URL input if
   # @navigateUrl is called after setting
   url: ''
-
-  loading: false
 
   actions:
     ###
