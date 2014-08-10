@@ -27,18 +27,11 @@ After installing the dev dependencies...
 
 ...you can:
 
-**run the default task** which watches the source directory, then runs the specs
-whenever part of the functional source changes
+**run the default task (watch)** which watches the source directory, compiling
+and assembling the app as changes are made to the source or spec files that
+require compilation
 
     $ gulp
-
-(specs are yet to be included)
-
-**run the autobuild task** which watches the source directory, compiling and
-assembling the app as changes are made to the source files that require
-compilation
-
-    $ gulp autobuild
 
 or **run the release task** which compiles, assembles, and packages the app ready
 for deployment to the Chrome web store.
@@ -50,3 +43,36 @@ for deployment to the Chrome web store.
 Once the app is built (current revisions should be checked in, but build prior
 to loading to ensure their versions are consistent), you can load the unpacked
 app from the `APP_ROOT` directory
+
+If you are making changes to the browser itself, load the test harness as well.
+It is the same process as loading the unpacked app, just point at `TEST_ROOT`
+instead of `APP_ROOT`
+
+## Gulp Tasks
+
+    gulp [TASK]
+
+where `TASK` is one of the following:
+
+* `autobuild`: Watches the `/templates`, `/styles` and `/scripts` directories.
+When changes are detected it will compile and assemble the app, ready for
+loading into Chrome.
+
+* `watch`: Watches the `/templates` and `/scripts` directories. When changes are
+detected, it will initiate the spec runner task, `gulp spec`
+
+* `spec`: Runs the tests/specs for the application. Not yet implemented.
+
+* `assemble`: Takes the source files in `/templates`, `/styles`, `/scripts` and
+runs them through their compilers (Handlebars, SASS, CoffeeScript
+respectively). The compiled output is concatenated (and minified in the case
+of JS), and output into an intermediate directory outside of `APP_ROOT`. The
+compiled and minified source from the intermediate directory is then copied
+into the appropriate directory in `/APP_ROOT`
+
+* `release`: Performs a clean compilation of the application, resulting in a
+package ready to deploy to the Chrome web store. The output archive is
+tagged with the version, read from the manifest, of the form:
+`<name>-<version>.zip`.  Note that `<name>` is not read from the manifest, but
+declared in gulpfile.js
+

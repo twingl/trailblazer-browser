@@ -7,3 +7,8 @@ tmp/
 APP_ROOT/styles/app.min.css
 APP_ROOT/templates/app.hbs.min.js
 APP_ROOT/scripts/app.min.js
+
+TEST_ROOT/specs/suite.js
+TEST_ROOT/styles/app.min.css
+TEST_ROOT/templates/app.hbs.min.js
+TEST_ROOT/scripts/app.min.js

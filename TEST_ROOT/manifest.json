@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Trailblazer TEST SUITE",
+  "short_name": "TB_TEST",
+  "description": "Companion test suite for Trailblazer",
+  "version": "0.0.1",
+  "minimum_chrome_version": "29",
+  "permissions": [
+    "webview",
+    "storage",
+    "identity",
+    "unlimitedStorage",
+    "https://app.trailblazer.io/"
+  ],
+  "icons": {
+    "16":"icons/16.png",
+    "128":"icons/128.png"
+  },
+  "app": {
+    "background": {
+      "scripts": [
+        "vendor/lib/underscore-1.6.0.js",
+        "vendor/lib/buffered-storage.js",
+        "vendor/lib/keen-2.1.0.min.js",
+        "background.js"
+      ]
+    }
+  },
+  "sandbox": {
+    "pages": [  ]
+  }
+}

@@ -9,7 +9,6 @@
     "gulp-concat": "^2.2.0",
     "gulp-watch": "^0.5.4",
     "gulp-sass": "^0.7.1",
-    "gulp-uglify": "^0.2.1",
     "gulp-declare": "^0.2.0",
     "gulp-define-module": "^0.1.0",
     "gulp-ember-handlebars": "^0.6.0",

@@ -81,35 +81,6 @@ Twingl.TreeController = Ember.Controller.extend
     "TB.tmp." + Math.random().toString(36).substr(2, 9)
 
   actions:
-    loadHistory: (cb) ->
-      id  = @get('assignment').get('id')
-      url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
-
-      Ember.$.get url, (response) =>
-        if response.nodes.length > 0
-          # open the trail view
-          # TODO set the current page to [current_node_id]
-          for node in response.nodes
-            @get('historyStack').push node
-            @get('historyMap')[node.id] = node
-
-          currentNodeId = @get('assignment').get('current_node_id')
-          if currentNodeId and @get('historyMap').hasOwnProperty(currentNodeId)
-            @set 'currentNodeId', @get('assignment').get('current_node_id')
-          else
-            @set 'currentNodeId', @get('historyStack').filterBy("arrived_at")[0].id
-
-          # Navigation elements fail to hide/show if run without a slight delay
-          setTimeout ( => @get('navigation').send('historyShow')), 40
-
-          @get('webview').navigate @currentNode().url, false
-        else
-          # we have an empty project - send us to the home page
-          setTimeout ( => @get('navigation').send('browserShow')), 40
-          @get('webview').navigate(window.ENV['default_page'])
-        console.log @get('historyStack'), @get('historyMap')
-        cb()
-
     pushItem: (node) ->
       id  = @get('assignment').get('id')
       url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"

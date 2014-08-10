@@ -1,6 +1,6 @@
 Twingl.AssignmentListItem = Ember.Component.extend
   tagName   : 'li'
-  classNames: []
+  classNames: ['assignment']
   action    : "setAssignment"
   layoutName: "main/assignments/list_item"
 
