@@ -283,12 +283,13 @@ Twingl.TreeController = Ember.Controller.extend
            .attr("y", (d) -> d.y-d.offsets.y.minor)
 
     force.on "end", =>
-      o = {}
-      _.each nodes, (n) =>
-        @get('historyMap')[n.id].x = n.x
-        @get('historyMap')[n.id].y = n.y
-        o[n.id] = { x: n.x, y: n.y }
-      Ember.$.ajax "#{window.ENV['api_base']}/assignments/#{@get('assignment').id}/nodes/coords",
-        method: "PUT"
-        contentType: "application/json"
-        data: JSON.stringify({ nodes: o })
+      try
+        o = {}
+        _.each nodes, (n) =>
+          @get('historyMap')[n.id].x = n.x
+          @get('historyMap')[n.id].y = n.y
+          o[n.id] = { x: n.x, y: n.y }
+        Ember.$.ajax "#{window.ENV['api_base']}/assignments/#{@get('assignment').id}/nodes/coords",
+          method: "PUT"
+          contentType: "application/json"
+          data: JSON.stringify({ nodes: o })
