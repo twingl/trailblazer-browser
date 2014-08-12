@@ -1,9 +1,9 @@
 Twingl.BrowserRoute = Ember.Route.extend SimpleAuth.AuthenticatedRouteMixin,
-  model: ->
+  model: (params) ->
     # Retrieve the assignment history (nodes) from the server and return the
     # promise to be handled by Ember
-    id = @controllerFor('application').get('assignment').id
-    url = "#{window.ENV['api_base']}/assignments/#{id}/nodes"
+    console.log params
+    url = "#{window.ENV['api_base']}/assignments/#{params.assignment_id}/nodes"
     Ember.$.getJSON url
 
   setupController: (controller, model) ->

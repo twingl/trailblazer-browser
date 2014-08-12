@@ -5,7 +5,9 @@
 
   <ul>
   {{#each assignment in model}}
-    {{view Twingl.AssignmentListItem assignment=assignment}}
+    {{#link-to 'browser' assignment.id}}
+      {{view Twingl.AssignmentListItem assignment=assignment}}
+    {{/link-to}}
   {{/each}}
   </ul>
 </div>
