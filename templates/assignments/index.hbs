@@ -1,0 +1,11 @@
+<h1>Your Assignments</h1>
+
+<p>Tap to start or resume an assignment</p>
+
+<ul>
+{{#each assignment in model}}
+  {{#link-to 'browser' assignment.id}}
+    {{view Twingl.AssignmentListItem assignment=assignment}}
+  {{/link-to}}
+{{/each}}
+</ul>
