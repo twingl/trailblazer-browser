@@ -1,21 +1,14 @@
+# Authenticated route - hitting this without a valid session will transition
+# the application to the login screen
 Twingl.BrowserRoute = Ember.Route.extend SimpleAuth.AuthenticatedRouteMixin,
   model: (params) ->
     # Retrieve the assignment from the store
     @store.find 'assignment', params.assignment_id
 
   renderTemplate: ->
-    @render 'main/webview',
-      outlet: 'main'
-      controller: 'webview'
+    # Invoke the default rendering behaviour (renders templates/browser.hbs
+    # into the application outlet according to Ember conventions)
+    @_super()
 
-    @render 'navigation/browser',
-      outlet: 'navigation'
-      controller: 'navigation'
-
-    @render 'alt/tree',
-      outlet: 'alt'
-      controller: 'tree'
-
-    @render 'windowNavigation/projects',
-      outlet: 'windowNavigation'
-      controller: 'application'
+    # Render the navigation widgets we need into the navigation outlet
+    @render 'navigation/browser', outlet: 'navigation'

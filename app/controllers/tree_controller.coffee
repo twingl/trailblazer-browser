@@ -142,8 +142,8 @@ Twingl.TreeController = Ember.Controller.extend
     # Rendering the graph
     ###
     drawTree: ->
-      Ember.$("#tb-history-tree-viz").html('')
-      @get("d3data").svg = d3.select('#tb-history-tree-viz').append('svg')
+      Ember.$("#tb-trail-view").html('')
+      @get("d3data").svg = d3.select('#tb-trail-view').append('svg')
 
       if @get("historyStack").length > 0
         @update()
