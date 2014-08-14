@@ -5,7 +5,7 @@ Twingl.ApplicationRoute = Ember.Route.extend SimpleAuth.ApplicationRouteMixin,
     # for details, under SimpleAuth.ApplicationRouteMixin's "Actions" section
     sessionAuthenticationSucceeded: ->
       console.log "logged in"
-      # Transition to the assignment selection page
+      # Transition to the assignments index
       @transitionTo 'assignments'
 
     sessionAuthenticationFailed: (error) ->

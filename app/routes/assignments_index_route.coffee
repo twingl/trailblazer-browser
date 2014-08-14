@@ -1,4 +1,5 @@
+# Authenticated route - hitting this without a valid session will transition
+# the application to the login screen
 Twingl.AssignmentsIndexRoute = Ember.Route.extend SimpleAuth.AuthenticatedRouteMixin,
   model: ->
-    console.log "route hit"
     @store.findAll('assignment')
